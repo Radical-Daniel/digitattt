@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "609550035634",
+    "project_id": "digitat-80a24",
+    "storage_bucket": "digitat-80a24.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:609550035634:android:81307cf3f6fccdef91b7ab",
+        "android_client_info": {
+          "package_name": "com.hewinfra.digitat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "609550035634-98nuu0l2m2g25hup942tk110akinbuo7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0p9MSVzH1z9A3n3gbObBvqlCXynKM7sE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "609550035634-98nuu0l2m2g25hup942tk110akinbuo7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">digitAT</string>
+
+    <string name="facebook_app_id">2391872287774119</string>
+
+ 
+    <string name="fb_login_protocol_scheme">fb2391872287774119</string>
+</resources>

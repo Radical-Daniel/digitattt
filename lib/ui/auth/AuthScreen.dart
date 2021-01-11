@@ -31,7 +31,8 @@ class AuthScreen extends StatelessWidget {
                 'welcome',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: Color(COLOR_ACCENT),
+                    color: Color(COLOR_PRIMARY),
+                    fontFamily: 'Bauhaus93',
                     fontSize: 24.0,
                     fontWeight: FontWeight.bold),
               ).tr(),

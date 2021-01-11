@@ -16,7 +16,6 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:uuid/uuid.dart';
 import 'package:instachatty/model/Business.dart';
-import 'package:instachatty/model/ServiceModel.dart';
 import 'package:instachatty/model/AddressModel.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:instachatty/model/BookingRequest.dart';

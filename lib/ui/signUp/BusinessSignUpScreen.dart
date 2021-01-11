@@ -16,27 +16,48 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:uuid/uuid.dart';
 import 'package:instachatty/model/Business.dart';
-import 'package:instachatty/model/ServiceModel.dart';
 import 'package:instachatty/model/AddressModel.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:country_state_city_picker/country_state_city_picker.dart';
 
 File _image;
-Map<String, dynamic> _filterList = {
-  'doctor': false,
-  'pharmacist': false,
-  'laboratory': false,
-  'radiologist': false,
-  // 'hospital': false,
-  // 'clinic': false,
-  // 'fitness': false,
-  // 'hospitality': false,
-  // 'insurance': false,
-  // 'travel': false,
-  // 'wellness': false,
-  // 'student': false,
-  // 'education': false
-};
+ServicesMap servicesMap = ServicesMap(
+  services: {
+    'doctor': {
+      'provides': true,
+      'isHealthService': true,
+      'rating': 5.0,
+      'completedServices': 0
+    },
+    'pharmacist': {
+      'provides': false,
+      'isHealthService': true,
+      'rating': 5.0,
+      'completedServices': 0
+    },
+    'laboratory': {
+      'provides': false,
+      'isHealthService': true,
+      'rating': 5.0,
+      'completedServices': 0
+    },
+    'radiologist': {
+      'provides': false,
+      'isHealthService': true,
+      'rating': 5.0,
+      'completedServices': 0
+    },
+    // 'ambulance': {'provides' : false, 'isHealthService' : true, 'rating': 5.0,'completedServices': 0},
+    // 'hospital': {'provides' : false, 'isHealthService' : true, 'rating': 5.0,'completedServices': 0},
+    // 'clinic': {'provides' : false, 'isHealthService' : true, 'rating': 5.0,'completedServices': 0},
+    // 'fitness': {'provides' : false, 'isHealthService' : true, 'rating': 5.0,'completedServices': 0},
+    // 'hospitality': {'provides' : false, 'isHealthService' : false, 'rating': 5.0,'completedServices': 0},
+    // 'insurance': {'provides' : false, 'isHealthService' : false, 'rating': 5.0,'completedServices': 0},
+    // 'travel': {'provides' : false, 'isHealthService' : false, 'rating': 5.0,'completedServices': 0},
+    // 'wellness': {'provides' : false, 'isHealthService' : false, 'rating': 5.0,'completedServices': 0},
+    // 'education': {'provides' : false, 'isHealthService' : false, 'rating': 5.0,'completedServices': 0},
+  },
+);
 
 class BusinessSignUpScreen extends StatefulWidget {
   final User user;
@@ -74,23 +95,8 @@ class _SignUpState extends State<BusinessSignUpScreen> {
       _isPhoneValid = false,
       _codeSent = false,
       isPartner = false;
-  bool isHealthService = false;
+  bool isHealthBusiness = false;
   Uuid uuid = Uuid();
-  InterestMap interest = InterestMap(interest: {
-    'doctor': false,
-    'pharmacist': false,
-    'laboratory': false,
-    'retail': false,
-    'ambulance': false,
-    'radiologist': false,
-    'hospital': false,
-    'clinic': false,
-    'insurance': false,
-    'travel': false,
-    'wellness': false,
-    'student': false,
-    'education': false
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -227,12 +233,12 @@ class _SignUpState extends State<BusinessSignUpScreen> {
             Text("Healthcare Services Partner?"),
             Switch(
               activeColor: Color(COLOR_PRIMARY),
-              value: isHealthService,
+              value: isHealthBusiness,
               onChanged: (bool value) {
                 setState(() {
-                  isHealthService = value;
+                  isHealthBusiness = value;
                 });
-                print(isHealthService);
+                print(isHealthBusiness);
               },
             ),
           ],
@@ -245,17 +251,17 @@ class _SignUpState extends State<BusinessSignUpScreen> {
                 Padding(
                     padding: const EdgeInsets.all(4.0),
                     child: FilterChip(
-                      selected: _filterList['doctor'],
+                      selected: servicesMap.services['doctor']['provides'],
                       selectedColor: Color(COLOR_PRIMARY),
                       onSelected: (bool value) {
                         setState(() {
-                          _filterList['doctor'] = value;
+                          servicesMap.services['doctor']['provides'] = value;
                         });
                       },
                       label: Text(
                         "DOCTOR",
                         style: TextStyle(
-                            color: _filterList['doctor']
+                            color: servicesMap.services['doctor']['provides']
                                 ? Colors.white
                                 : Colors.black),
                       ),
@@ -263,17 +269,19 @@ class _SignUpState extends State<BusinessSignUpScreen> {
                 Padding(
                     padding: const EdgeInsets.all(4.0),
                     child: FilterChip(
-                      selected: _filterList['pharmacist'],
+                      selected: servicesMap.services['pharmacist']['provides'],
                       selectedColor: Color(COLOR_PRIMARY),
                       onSelected: (value) {
                         setState(() {
-                          _filterList['pharmacist'] = value;
+                          servicesMap.services['pharmacist']['provides'] =
+                              value;
                         });
                       },
                       label: Text(
                         "PHARMACIST",
                         style: TextStyle(
-                            color: _filterList['pharmacist']
+                            color: servicesMap.services['pharmacist']
+                                    ['provides']
                                 ? Colors.white
                                 : Colors.black),
                       ),
@@ -281,17 +289,19 @@ class _SignUpState extends State<BusinessSignUpScreen> {
                 Padding(
                     padding: const EdgeInsets.all(4.0),
                     child: FilterChip(
-                      selected: _filterList['laboratory'],
+                      selected: servicesMap.services['laboratory']['provides'],
                       selectedColor: Color(COLOR_PRIMARY),
                       onSelected: (bool value) {
                         setState(() {
-                          _filterList['laboratory'] = value;
+                          servicesMap.services['laboratory']['provides'] =
+                              value;
                         });
                       },
                       label: Text(
                         "LABORATORY",
                         style: TextStyle(
-                            color: _filterList['laboratory']
+                            color: servicesMap.services['laboratory']
+                                    ['provides']
                                 ? Colors.white
                                 : Colors.black),
                       ),
@@ -299,17 +309,19 @@ class _SignUpState extends State<BusinessSignUpScreen> {
                 Padding(
                     padding: const EdgeInsets.all(4.0),
                     child: FilterChip(
-                      selected: _filterList['radiologist'],
+                      selected: servicesMap.services['radiologist']['provides'],
                       selectedColor: Color(COLOR_PRIMARY),
                       onSelected: (bool value) {
                         setState(() {
-                          _filterList['radiologist'] = value;
+                          servicesMap.services['radiologist']['provides'] =
+                              value;
                         });
                       },
                       label: Text(
                         "RADIOLOGIST",
                         style: TextStyle(
-                            color: _filterList['radiologist']
+                            color: servicesMap.services['radiologist']
+                                    ['provides']
                                 ? Colors.white
                                 : Colors.black),
                       ),
@@ -317,7 +329,7 @@ class _SignUpState extends State<BusinessSignUpScreen> {
               ],
             ),
           ),
-          visible: isHealthService,
+          visible: isHealthBusiness,
         ),
         Visibility(
           visible: !_codeSent,
@@ -642,21 +654,6 @@ class _SignUpState extends State<BusinessSignUpScreen> {
   }
 
   _sendToServer() async {
-    List services =
-        _filterList.keys.where((key) => _filterList[key] == true).toList();
-    List<ServiceModel> businessServices = [];
-    services.forEach((
-      service,
-    ) {
-      int index = _filterList.keys.toList().indexOf(service);
-      ServiceModel serviceModel = ServiceModel(
-          isHealthService: true,
-          rating: 5.0,
-          completedServices: 0,
-          serviceType: Services.values[index]);
-      businessServices.add(serviceModel);
-    });
-    String addressTest = businessAddress;
     if (_key.currentState.validate()) {
       String businessID = uuid.v4();
       _key.currentState.save();
@@ -666,8 +663,8 @@ class _SignUpState extends State<BusinessSignUpScreen> {
         // AuthResult result = await FirebaseAuth.instance
         //     .createUserWithEmailAndPassword(
         //         email: businessEmail, password: password);
-        if (_image != null) {
-          updateProgress('uploadingImagePleaseWait'.tr());
+        if (_image == null) {
+          _image = updateProgress('uploadingImagePleaseWait'.tr());
           profilePicUrl = await FireStoreUtils()
               .uploadBusinessImageToFireStorage(_image, businessID);
         }
@@ -681,16 +678,8 @@ class _SignUpState extends State<BusinessSignUpScreen> {
             ],
             businessPhoneNumber: [businessPhoneNumber],
             businessID: businessID,
-            isHealthService: isHealthService,
-            businessServices: businessServices.length > 0
-                ? businessServices
-                : [
-                    ServiceModel(
-                        isHealthService: isHealthService,
-                        rating: 5.0,
-                        completedServices: 0,
-                        serviceType: Services.None)
-                  ],
+            isHealthBusiness: isHealthBusiness,
+            servicesMap: servicesMap,
             lastOnlineTimestamp: Timestamp.now(),
             active: true,
             // fcmToken: await FirebaseMessaging().getToken(),
@@ -698,7 +687,7 @@ class _SignUpState extends State<BusinessSignUpScreen> {
               await AddressModel(address: businessAddress).geoAddress(),
             ],
             businessLogoURL: profilePicUrl);
-        !isHealthService
+        !isHealthBusiness
             ? await FireStoreUtils.firestore
                 .collection(BUSINESSES)
                 .document(businessID)

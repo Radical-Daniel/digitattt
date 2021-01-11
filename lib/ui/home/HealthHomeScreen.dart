@@ -193,7 +193,7 @@ class _HealthHomeState extends State<HealthHome>
                           child: SizedBox(
                             child: FlatButton(
                                 onPressed: () {},
-                                child: Image.asset("assets/images/nurse.png")),
+                                child: Image.asset("assets/images/doctor.png")),
                             height: 90.0,
                             width: 150.0,
                           ),
@@ -202,7 +202,7 @@ class _HealthHomeState extends State<HealthHome>
                           margin: EdgeInsets.symmetric(horizontal: 10.0),
                           color: Colors.white70,
                           child: SizedBox(
-                            child: Image.asset("assets/images/pill.png"),
+                            child: Image.asset("assets/images/pharmacist.png"),
                             height: 90.0,
                             width: 150.0,
                           ),
@@ -219,7 +219,7 @@ class _HealthHomeState extends State<HealthHome>
                           margin: EdgeInsets.symmetric(horizontal: 10.0),
                           color: Colors.white70,
                           child: SizedBox(
-                            child: Image.asset("assets/images/microscope.png"),
+                            child: Image.asset("assets/images/radiologist.png"),
                             height: 90.0,
                             width: 150.0,
                           ),
@@ -228,7 +228,7 @@ class _HealthHomeState extends State<HealthHome>
                           margin: EdgeInsets.symmetric(horizontal: 10.0),
                           color: Colors.white70,
                           child: SizedBox(
-                            child: Image.asset("assets/images/TheLab.png"),
+                            child: Image.asset("assets/images/laboratory.png"),
                             height: 90.0,
                             width: 150.0,
                           ),

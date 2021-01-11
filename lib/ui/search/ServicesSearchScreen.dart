@@ -15,7 +15,6 @@ import 'package:provider/provider.dart';
 import 'package:instachatty/model/Business.dart';
 import 'package:instachatty/model/BookingRequest.dart';
 import 'package:instachatty/ui/home/HomeScreen.dart';
-import 'package:instachatty/model/ServiceModel.dart';
 
 List<Business> _searchResult = [];
 Map<String, dynamic> _filterList = {
@@ -36,7 +35,7 @@ Map<String, dynamic> _filterList = {
   'student': false,
   'education': false
 };
-
+TextEditingController requestDetailsController = TextEditingController();
 List<Business> _businesses = [];
 
 class BuildContactInfo extends ChangeNotifier {
@@ -328,9 +327,17 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                     channelID);
                                         List<Card> createServiceCards() {
                                           List<Card> serviceCards = [];
-                                          partner.businessServices
-                                              .cast<ServiceModel>()
-                                              .forEach((service) {
+                                          partner.servicesMap.services.keys
+                                              .where((service) =>
+                                                  partner.servicesMap
+                                                          .services[service]
+                                                      ['provides'] ==
+                                                  true)
+                                              .map((service) => partner
+                                                  .servicesMap
+                                                  .services[service])
+                                              .toList()
+                                              .forEach((providedService) {
                                             Card card = Card(
                                               margin: EdgeInsets.symmetric(
                                                   horizontal: 10.0),
@@ -345,40 +352,88 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                       MainAxisAlignment
                                                           .spaceEvenly,
                                                   children: [
-                                                    Text(
-                                                      service.rating.toString(),
-                                                    ),
+                                                    Text(providedService
+                                                        .keys.first),
                                                     Padding(
                                                       padding:
                                                           const EdgeInsets.all(
                                                               18.0),
-                                                      child: Icon(
-                                                        Icons.medical_services,
-                                                        color: Color(
-                                                            COLOR_PRIMARY),
-                                                        size: 50.0,
+                                                      child: Image.asset(
+                                                        'assets/images/${providedService.keys.first}.png',
+                                                        width: 50.0,
+                                                        height: 50.0,
                                                       ),
                                                     ),
                                                     RaisedButton(
                                                       color:
                                                           Color(COLOR_PRIMARY),
                                                       child: Text(
-                                                        "Book",
+                                                        "Select",
                                                         style: TextStyle(
                                                             color:
                                                                 Colors.white),
                                                       ),
-                                                      onPressed: () async {
-                                                        await _sendToServer(
-                                                            _businesses[index]);
+                                                      onPressed: () {
+                                                        showDialog(
+                                                            context: context,
+                                                            builder: (context) {
+                                                              return Dialog(
+                                                                  shape: RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              40)),
+                                                                  elevation: 16,
+                                                                  child:
+                                                                      Container(
+                                                                    height: 200,
+                                                                    width: 350,
+                                                                    child: Padding(
+                                                                        padding: const EdgeInsets.only(top: 40.0, left: 16, right: 16, bottom: 16),
+                                                                        child: Column(
+                                                                          mainAxisSize:
+                                                                              MainAxisSize.max,
+                                                                          children: <
+                                                                              Widget>[
+                                                                            TextField(
+                                                                              textInputAction: TextInputAction.done,
+                                                                              keyboardType: TextInputType.text,
+                                                                              textCapitalization: TextCapitalization.sentences,
+                                                                              controller: requestDetailsController,
+                                                                              decoration: InputDecoration(
+                                                                                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25.0), borderSide: BorderSide(color: Color(COLOR_PRIMARY), width: 2.0)),
+                                                                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(25.0)),
+                                                                                labelText: 'Details',
+                                                                              ),
+                                                                            ),
+                                                                            Spacer(),
+                                                                            Row(
+//                                          spacing: 30,
+                                                                              children: <Widget>[
+                                                                                FlatButton(
+                                                                                    onPressed: () {
+                                                                                      Navigator.pop(context);
+                                                                                    },
+                                                                                    child: Text(
+                                                                                      'cancel',
+                                                                                      style: TextStyle(
+                                                                                        fontSize: 18,
+                                                                                      ),
+                                                                                    ).tr()),
+                                                                                FlatButton(onPressed: () async {}, child: Text('Submit', style: TextStyle(fontSize: 18, color: Color(COLOR_PRIMARY)))),
+                                                                              ],
+                                                                            )
+                                                                          ],
+                                                                        )),
+                                                                  ));
+                                                            });
                                                       },
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                             );
-                                            serviceCards.add(card);
                                           });
+
                                           return serviceCards;
                                         }
 
@@ -471,56 +526,8 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                               scrollDirection:
                                                                   Axis.horizontal,
                                                               child: Row(
-                                                                children: [
-                                                                  Card(
-                                                                    margin: EdgeInsets.symmetric(
-                                                                        horizontal:
-                                                                            10.0),
-                                                                    color: Colors
-                                                                        .white70,
-                                                                    child:
-                                                                        Padding(
-                                                                      padding: const EdgeInsets
-                                                                              .symmetric(
-                                                                          horizontal:
-                                                                              28.0,
-                                                                          vertical:
-                                                                              10.0),
-                                                                      child:
-                                                                          Column(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.spaceEvenly,
-                                                                        children: [
-                                                                          Text(
-                                                                              "Consultation"),
-                                                                          Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.all(18.0),
-                                                                            child:
-                                                                                Icon(
-                                                                              Icons.medical_services,
-                                                                              color: Color(COLOR_PRIMARY),
-                                                                              size: 50.0,
-                                                                            ),
-                                                                          ),
-                                                                          RaisedButton(
-                                                                            color:
-                                                                                Color(COLOR_PRIMARY),
-                                                                            child:
-                                                                                Text(
-                                                                              "Book",
-                                                                              style: TextStyle(color: Colors.white),
-                                                                            ),
-                                                                            onPressed:
-                                                                                () async {
-                                                                              await _sendToServer(_businesses[index]);
-                                                                            },
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ],
+                                                                children:
+                                                                    createServiceCards(),
                                                               ),
                                                             ),
                                                           ],
@@ -818,24 +825,24 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
     }
   }
 
-  String getServicesTextByType(Services serviceType) {
-    switch (serviceType) {
-      case Services.Doctor:
-        return 'Doctor';
-        break;
-      case Services.Radiologist:
-        return 'Radiologist';
-        break;
-      case Services.Laboratory:
-        return 'Laboratory';
-        break;
-      case Services.Pharmacist:
-        return 'Pharmacist';
-        break;
-      default:
-        return 'Other';
-    }
-  }
+  // String getServicesTextByType(Services serviceType) {
+  //   switch (serviceType) {
+  //     case Services.Doctor:
+  //       return 'Doctor';
+  //       break;
+  //     case Services.Radiologist:
+  //       return 'Radiologist';
+  //       break;
+  //     case Services.Laboratory:
+  //       return 'Laboratory';
+  //       break;
+  //     case Services.Pharmacist:
+  //       return 'Pharmacist';
+  //       break;
+  //     default:
+  //       return 'Other';
+  //   }
+  // }
 
   _sendToServer(business) async {
     showProgress(context, 'Creating request', false);

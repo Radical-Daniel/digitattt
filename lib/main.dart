@@ -159,20 +159,27 @@ class OnBoardingState extends State<OnBoarding> {
       FirebaseUser firebaseUser = await FirebaseAuth.instance.currentUser();
       if (firebaseUser != null) {
         User user = await FireStoreUtils().getCurrentUser(firebaseUser.uid);
-
-        Business business = await FireStoreUtils()
-            .getCurrentBusiness(user.businessAffiliations.last);
-
         if (user != null) {
           user.active = true;
           await FireStoreUtils.updateCurrentUser(user);
           MyAppState.currentUser = user;
-          pushReplacement(
-              context,
-              new HomeScreen(
-                user: user,
-                business: business,
-              ));
+          if (user.isPartner) {
+            Business business = await FireStoreUtils()
+                .getCurrentBusiness(user.businessAffiliations.last);
+
+            pushReplacement(
+                context,
+                new HomeScreen(
+                  user: user,
+                  business: business,
+                ));
+          } else {
+            pushReplacement(
+                context,
+                new HomeScreen(
+                  user: user,
+                ));
+          }
         } else {
           pushReplacement(context, new AuthScreen());
         }

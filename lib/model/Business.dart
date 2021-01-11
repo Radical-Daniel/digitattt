@@ -45,7 +45,7 @@ class Business with ChangeNotifier {
         businessAddress: parsedJson['businessAddress'] ?? '',
         businessEmail: parsedJson['businessEmail'] ?? '',
         businessPhoneNumber: parsedJson['businessPhoneNumber'] ?? [],
-        servicesMap: parsedJson['servicesMap'] ??
+        servicesMap: ServicesMap.fromJson(parsedJson['servicesMap']) ??
             {
               'services': {
                 'doctor': {

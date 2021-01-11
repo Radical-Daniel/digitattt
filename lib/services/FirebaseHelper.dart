@@ -211,15 +211,20 @@ class FireStoreUtils {
 
   Future<List<Business>> getBusinesses(
       String businessID, bool searchScreen) async {
+    print("started");
     businesses = [];
-    await firestore.collection(PARTNERS).getDocuments().then((onValue) {
+    await firestore.collection(BUSINESSES).getDocuments().then((onValue) {
+      print("maga");
       onValue.documents.asMap().forEach((index, partner) {
+        print(partner.data);
         Business business = Business.fromJson(partner.data);
 
         businesses.add(business);
+        print(businesses.length);
+        print(businesses.length);
       });
     }, onError: (e) {
-      print('error $e');
+      print('error by the $e');
     });
     return businesses;
   }

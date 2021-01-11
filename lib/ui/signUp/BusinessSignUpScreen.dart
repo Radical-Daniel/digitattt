@@ -446,6 +446,7 @@ class _SignUpState extends State<BusinessSignUpScreen> {
                       },
                       controller: _businessAddressController,
                       textInputAction: TextInputAction.next,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       onFieldSubmitted: (_) =>
                           FocusScope.of(context).nextFocus(),
                       decoration: InputDecoration(
@@ -663,10 +664,10 @@ class _SignUpState extends State<BusinessSignUpScreen> {
         // AuthResult result = await FirebaseAuth.instance
         //     .createUserWithEmailAndPassword(
         //         email: businessEmail, password: password);
-        if (_image == null) {
-          _image = updateProgress('uploadingImagePleaseWait'.tr());
+        if (_image != null) {
           profilePicUrl = await FireStoreUtils()
               .uploadBusinessImageToFireStorage(_image, businessID);
+          _image = updateProgress('uploadingImagePleaseWait'.tr());
         }
         Business business = Business(
             businessRepID: user.userID,
@@ -687,15 +688,10 @@ class _SignUpState extends State<BusinessSignUpScreen> {
               await AddressModel(address: businessAddress).geoAddress(),
             ],
             businessLogoURL: profilePicUrl);
-        !isHealthBusiness
-            ? await FireStoreUtils.firestore
-                .collection(BUSINESSES)
-                .document(businessID)
-                .setData(business.toJson())
-            : await FireStoreUtils.firestore
-                .collection(PARTNERS)
-                .document(businessID)
-                .setData(business.toJson());
+        await FireStoreUtils.firestore
+            .collection(BUSINESSES)
+            .document(businessID)
+            .setData(business.toJson());
         user.isPartner = true;
         user.businessAffiliations.add(businessID);
         FireStoreUtils.updateUserState(user);

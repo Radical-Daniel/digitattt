@@ -42,6 +42,7 @@ class ChatHomeScreen extends StatefulWidget {
 
 class _HomeState extends State<ChatHomeScreen>
     with SingleTickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   AnimationController _controller;
   Animation<double> _heightAnimation;
   Animation<double> _iconSizeAnimation;
@@ -98,6 +99,7 @@ class _HomeState extends State<ChatHomeScreen>
     return ChangeNotifierProvider.value(
       value: user,
       child: Scaffold(
+        key: _scaffoldKey,
         extendBody: true,
         drawer: Drawer(
           child: ListView(
@@ -224,11 +226,13 @@ class _HomeState extends State<ChatHomeScreen>
                           letterSpacing: 1.0,
                         ),
                       ).tr(),
-                      leading: Icon(
-                        Icons.search,
-                        color: _drawerSelection == DrawerSelection.Search
-                            ? Colors.white
-                            : Color(COLOR_PRIMARY),
+                      leading: IconButton(
+                        icon: Icon(
+                          Icons.search,
+                          color: _drawerSelection == DrawerSelection.Search
+                              ? Colors.white
+                              : Color(COLOR_PRIMARY),
+                        ),
                       ),
                       contentPadding: LISTTILEPADDING,
                       onTap: () {
@@ -250,12 +254,19 @@ class _HomeState extends State<ChatHomeScreen>
         appBar: AppBar(
           // shadowColor: Color(COLOR_PRIMARY),
           backgroundColor: Color(COLOR_PRIMARY),
+          leading: IconButton(
+            onPressed: () {
+              _scaffoldKey.currentState.openDrawer();
+            },
+            icon: Icon(
+              Icons.chat_bubble,
+              color: Colors.white,
+            ),
+          ),
           title: Text(
-            'appName'.tr(),
-            style: TextStyle(
-                color:
-                    isDarkMode(context) ? Colors.grey.shade200 : Colors.white,
-                fontWeight: FontWeight.bold),
+            "digit@T",
+            style: TextStyle(fontFamily: 'Bauhaus93'),
+            textAlign: TextAlign.center,
           ),
           actions: <Widget>[
             HomeNavigator(

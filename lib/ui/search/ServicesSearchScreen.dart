@@ -92,8 +92,9 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
 
   @override
   void initState() {
-    super.initState();
     _future = fireStoreUtils.getBusinesses(user.userID, true);
+    print("initsss");
+    super.initState();
   }
 
   @override
@@ -303,7 +304,7 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                         ? new ListView.builder(
                             itemCount: _searchResult.length,
                             itemBuilder: (context, index) {
-                              Business partner = _searchResult[index];
+                              Business business = _searchResult[index];
                               return Column(
                                 children: <Widget>[
                                   Padding(
@@ -312,137 +313,155 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                     child: ListTile(
                                       onTap: () async {
                                         String channelID;
-                                        if (partner.businessID
+                                        if (business.businessID
                                                 .compareTo(user.userID) <
                                             0) {
                                           channelID =
-                                              partner.businessID + user.userID;
+                                              business.businessID + user.userID;
                                         } else {
                                           channelID =
-                                              user.userID + partner.businessID;
+                                              user.userID + business.businessID;
                                         }
                                         ConversationModel conversationModel =
                                             await fireStoreUtils
                                                 .getChannelByIdOrNull(
                                                     channelID);
                                         List<Card> createServiceCards() {
-                                          List<Card> serviceCards = [];
-                                          partner.servicesMap.services.keys
-                                              .where((service) =>
-                                                  partner.servicesMap
-                                                          .services[service]
-                                                      ['provides'] ==
-                                                  true)
-                                              .map((service) => partner
-                                                  .servicesMap
-                                                  .services[service])
-                                              .toList()
-                                              .forEach((providedService) {
-                                            Card card = Card(
-                                              margin: EdgeInsets.symmetric(
-                                                  horizontal: 10.0),
-                                              color: Colors.white70,
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 28.0,
-                                                        vertical: 10.0),
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  children: [
-                                                    Text(providedService
-                                                        .keys.first),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              18.0),
-                                                      child: Image.asset(
-                                                        'assets/images/${providedService.keys.first}.png',
-                                                        width: 50.0,
-                                                        height: 50.0,
-                                                      ),
-                                                    ),
-                                                    RaisedButton(
-                                                      color:
-                                                          Color(COLOR_PRIMARY),
-                                                      child: Text(
-                                                        "Select",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                      onPressed: () {
-                                                        showDialog(
-                                                            context: context,
-                                                            builder: (context) {
-                                                              return Dialog(
-                                                                  shape: RoundedRectangleBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              40)),
-                                                                  elevation: 16,
-                                                                  child:
-                                                                      Container(
-                                                                    height: 200,
-                                                                    width: 350,
-                                                                    child: Padding(
-                                                                        padding: const EdgeInsets.only(top: 40.0, left: 16, right: 16, bottom: 16),
-                                                                        child: Column(
-                                                                          mainAxisSize:
-                                                                              MainAxisSize.max,
-                                                                          children: <
-                                                                              Widget>[
-                                                                            TextField(
-                                                                              textInputAction: TextInputAction.done,
-                                                                              keyboardType: TextInputType.text,
-                                                                              textCapitalization: TextCapitalization.sentences,
-                                                                              controller: requestDetailsController,
-                                                                              decoration: InputDecoration(
-                                                                                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25.0), borderSide: BorderSide(color: Color(COLOR_PRIMARY), width: 2.0)),
-                                                                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(25.0)),
-                                                                                labelText: 'Details',
-                                                                              ),
-                                                                            ),
-                                                                            Spacer(),
-                                                                            Row(
-//                                          spacing: 30,
-                                                                              children: <Widget>[
-                                                                                FlatButton(
-                                                                                    onPressed: () {
-                                                                                      Navigator.pop(context);
-                                                                                    },
-                                                                                    child: Text(
-                                                                                      'cancel',
-                                                                                      style: TextStyle(
-                                                                                        fontSize: 18,
+                                          List<Card> serviceCards =
+                                              business.servicesMap.services.keys
+                                                  .where((service) =>
+                                                      business.servicesMap
+                                                              .services[service]
+                                                          ['provides'] ==
+                                                      true)
+                                                  .map((service) => Card(
+                                                        margin: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal:
+                                                                    10.0),
+                                                        color: Colors.white70,
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .symmetric(
+                                                                  horizontal:
+                                                                      28.0,
+                                                                  vertical:
+                                                                      10.0),
+                                                          child: Column(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceEvenly,
+                                                            children: [
+                                                              Text(
+                                                                service,
+                                                                style: TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                              Padding(
+                                                                padding: const EdgeInsets
+                                                                        .symmetric(
+                                                                    horizontal:
+                                                                        18.0,
+                                                                    vertical:
+                                                                        5.0),
+                                                                child:
+                                                                    Image.asset(
+                                                                  'assets/images/$service.png',
+                                                                  width: 50.0,
+                                                                  height: 50.0,
+                                                                ),
+                                                              ),
+                                                              Row(
+                                                                children: [
+                                                                  Icon(
+                                                                    Icons.star,
+                                                                    color: Colors
+                                                                        .orange,
+                                                                  ),
+                                                                  Text(
+                                                                    business
+                                                                        .servicesMap
+                                                                        .services[
+                                                                            service]
+                                                                            [
+                                                                            'rating']
+                                                                        .toString(),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              RaisedButton(
+                                                                color: Color(
+                                                                    COLOR_PRIMARY),
+                                                                child: Text(
+                                                                  "Select",
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .white),
+                                                                ),
+                                                                onPressed: () {
+                                                                  showDialog(
+                                                                      context:
+                                                                          context,
+                                                                      builder:
+                                                                          (context) {
+                                                                        return Dialog(
+                                                                            shape:
+                                                                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+                                                                            elevation: 16,
+                                                                            child: Container(
+                                                                              height: 200,
+                                                                              width: 350,
+                                                                              child: Padding(
+                                                                                  padding: const EdgeInsets.only(top: 40.0, left: 16, right: 16, bottom: 16),
+                                                                                  child: Column(
+                                                                                    mainAxisSize: MainAxisSize.max,
+                                                                                    children: <Widget>[
+                                                                                      TextField(
+                                                                                        textInputAction: TextInputAction.done,
+                                                                                        keyboardType: TextInputType.text,
+                                                                                        textCapitalization: TextCapitalization.sentences,
+                                                                                        controller: requestDetailsController,
+                                                                                        decoration: InputDecoration(
+                                                                                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25.0), borderSide: BorderSide(color: Color(COLOR_PRIMARY), width: 2.0)),
+                                                                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(25.0)),
+                                                                                          labelText: 'Details',
+                                                                                        ),
                                                                                       ),
-                                                                                    ).tr()),
-                                                                                FlatButton(onPressed: () async {}, child: Text('Submit', style: TextStyle(fontSize: 18, color: Color(COLOR_PRIMARY)))),
-                                                                              ],
-                                                                            )
-                                                                          ],
-                                                                        )),
-                                                                  ));
-                                                            });
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            );
-                                          });
+                                                                                      Spacer(),
+                                                                                      Row(
+//                                          spacing: 30,
+                                                                                        children: <Widget>[
+                                                                                          FlatButton(
+                                                                                              onPressed: () {
+                                                                                                Navigator.pop(context);
+                                                                                              },
+                                                                                              child: Text(
+                                                                                                'cancel',
+                                                                                                style: TextStyle(
+                                                                                                  fontSize: 18,
+                                                                                                ),
+                                                                                              ).tr()),
+                                                                                          FlatButton(onPressed: () async {}, child: Text('Submit', style: TextStyle(fontSize: 18, color: Color(COLOR_PRIMARY)))),
+                                                                                        ],
+                                                                                      )
+                                                                                    ],
+                                                                                  )),
+                                                                            ));
+                                                                      });
+                                                                },
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ))
+                                                  .toList();
 
                                           return serviceCards;
                                         }
 
-                                        // push(
-                                        //     context,
-                                        //     ChatInfoScreen(
-                                        //       member: contact.user,
-                                        //       user: user,
-                                        //     ));
                                         showBottomSheet(
                                             context: context,
                                             builder: (BuildContext context) {
@@ -475,7 +494,7 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                       ),
                                                     ),
                                                     Text(
-                                                      partner.businessName,
+                                                      business.businessName,
                                                       style: TextStyle(
                                                         fontSize: 19.0,
                                                         color: Colors.white,
@@ -486,7 +505,7 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                     // Divider(),
                                                     Center(
                                                       child: displayCircleImage(
-                                                          partner
+                                                          business
                                                               .businessLogoURL,
                                                           105,
                                                           false),
@@ -494,7 +513,8 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                     Column(
                                                       children: [
                                                         Text(
-                                                          partner.businessAbout,
+                                                          business
+                                                              .businessAbout,
                                                           style: TextStyle(
                                                               color:
                                                                   Colors.white,
@@ -512,7 +532,7 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                         child: Column(
                                                           children: [
                                                             SizedBox(
-                                                              height: 20.0,
+                                                              height: 5.0,
                                                             ),
                                                             Text(
                                                               "Services",
@@ -521,6 +541,9 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                                 color: Color(
                                                                     COLOR_PRIMARY),
                                                               ),
+                                                            ),
+                                                            SizedBox(
+                                                              height: 5.0,
                                                             ),
                                                             SingleChildScrollView(
                                                               scrollDirection:
@@ -540,11 +563,13 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                             });
                                       },
                                       leading: displayCircleImage(
-                                          partner.businessLogoURL, 55, false),
+                                          business.businessLogoURL, 55, false),
                                       title: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            '${partner.businessName}',
+                                            '${business.businessName}',
                                             style: TextStyle(
                                                 color: isDarkMode(context)
                                                     ? Colors.white
@@ -553,7 +578,7 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                 fontSize: 15),
                                           ),
                                           Text(
-                                            partner.businessAbout,
+                                            business.businessAbout,
                                             style: TextStyle(
                                               fontWeight: FontWeight.w300,
                                             ),
@@ -595,6 +620,145 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                               await fireStoreUtils
                                                   .getChannelByIdOrNull(
                                                       channelID);
+
+                                          List<Card> createServiceCards() {
+                                            List<Card> serviceCards = business
+                                                .servicesMap.services.keys
+                                                .where((service) =>
+                                                    business.servicesMap
+                                                            .services[service]
+                                                        ['provides'] ==
+                                                    true)
+                                                .map((service) => Card(
+                                                      margin:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10.0),
+                                                      color: Colors.white70,
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .symmetric(
+                                                                horizontal:
+                                                                    28.0,
+                                                                vertical: 10.0),
+                                                        child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceEvenly,
+                                                          children: [
+                                                            Text(
+                                                              service,
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                            Padding(
+                                                              padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                  horizontal:
+                                                                      18.0,
+                                                                  vertical:
+                                                                      5.0),
+                                                              child:
+                                                                  Image.asset(
+                                                                'assets/images/$service.png',
+                                                                width: 50.0,
+                                                                height: 50.0,
+                                                              ),
+                                                            ),
+                                                            Row(
+                                                              children: [
+                                                                Icon(
+                                                                  Icons.star,
+                                                                  color: Colors
+                                                                      .orange,
+                                                                ),
+                                                                Text(
+                                                                  business
+                                                                      .servicesMap
+                                                                      .services[
+                                                                          service]
+                                                                          [
+                                                                          'rating']
+                                                                      .toString(),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            RaisedButton(
+                                                              color: Color(
+                                                                  COLOR_PRIMARY),
+                                                              child: Text(
+                                                                "Select",
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                              onPressed: () {
+                                                                showDialog(
+                                                                    context:
+                                                                        context,
+                                                                    builder:
+                                                                        (context) {
+                                                                      return Dialog(
+                                                                          shape: RoundedRectangleBorder(
+                                                                              borderRadius: BorderRadius.circular(
+                                                                                  40)),
+                                                                          elevation:
+                                                                              16,
+                                                                          child:
+                                                                              Container(
+                                                                            height:
+                                                                                200,
+                                                                            width:
+                                                                                350,
+                                                                            child: Padding(
+                                                                                padding: const EdgeInsets.only(top: 40.0, left: 16, right: 16, bottom: 16),
+                                                                                child: Column(
+                                                                                  mainAxisSize: MainAxisSize.max,
+                                                                                  children: <Widget>[
+                                                                                    TextField(
+                                                                                      textInputAction: TextInputAction.done,
+                                                                                      keyboardType: TextInputType.text,
+                                                                                      textCapitalization: TextCapitalization.sentences,
+                                                                                      controller: requestDetailsController,
+                                                                                      decoration: InputDecoration(
+                                                                                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25.0), borderSide: BorderSide(color: Color(COLOR_PRIMARY), width: 2.0)),
+                                                                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(25.0)),
+                                                                                        labelText: 'Details',
+                                                                                      ),
+                                                                                    ),
+                                                                                    Spacer(),
+                                                                                    Row(
+//                                          spacing: 30,
+                                                                                      children: <Widget>[
+                                                                                        FlatButton(
+                                                                                            onPressed: () {
+                                                                                              Navigator.pop(context);
+                                                                                            },
+                                                                                            child: Text(
+                                                                                              'cancel',
+                                                                                              style: TextStyle(
+                                                                                                fontSize: 18,
+                                                                                              ),
+                                                                                            ).tr()),
+                                                                                        FlatButton(onPressed: () async {}, child: Text('Submit', style: TextStyle(fontSize: 18, color: Color(COLOR_PRIMARY)))),
+                                                                                      ],
+                                                                                    )
+                                                                                  ],
+                                                                                )),
+                                                                          ));
+                                                                    });
+                                                              },
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ))
+                                                .toList();
+
+                                            return serviceCards;
+                                          }
 
                                           showBottomSheet(
                                               context: context,
@@ -669,7 +833,7 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                           child: Column(
                                                             children: [
                                                               SizedBox(
-                                                                height: 20.0,
+                                                                height: 5.0,
                                                               ),
                                                               Text(
                                                                 "Services",
@@ -681,53 +845,15 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                                       COLOR_PRIMARY),
                                                                 ),
                                                               ),
+                                                              SizedBox(
+                                                                height: 5.0,
+                                                              ),
                                                               SingleChildScrollView(
                                                                 scrollDirection:
                                                                     Axis.horizontal,
                                                                 child: Row(
-                                                                  children: [
-                                                                    Card(
-                                                                      margin: EdgeInsets.symmetric(
-                                                                          horizontal:
-                                                                              10.0),
-                                                                      color: Colors
-                                                                          .white70,
-                                                                      child:
-                                                                          Padding(
-                                                                        padding: const EdgeInsets.symmetric(
-                                                                            horizontal:
-                                                                                28.0,
-                                                                            vertical:
-                                                                                10.0),
-                                                                        child:
-                                                                            Column(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.spaceEvenly,
-                                                                          children: [
-                                                                            Text("Consultation"),
-                                                                            Padding(
-                                                                              padding: const EdgeInsets.all(18.0),
-                                                                              child: Icon(
-                                                                                Icons.medical_services,
-                                                                                color: Color(COLOR_PRIMARY),
-                                                                                size: 50.0,
-                                                                              ),
-                                                                            ),
-                                                                            RaisedButton(
-                                                                              color: Color(COLOR_PRIMARY),
-                                                                              child: Text(
-                                                                                "Book",
-                                                                                style: TextStyle(color: Colors.white),
-                                                                              ),
-                                                                              onPressed: () async {
-                                                                                await _sendToServer(_businesses[index]);
-                                                                              },
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ],
+                                                                  children:
+                                                                      createServiceCards(),
                                                                 ),
                                                               ),
                                                             ],

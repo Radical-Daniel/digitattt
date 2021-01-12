@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:instachatty/constants.dart';
+import 'package:instachatty/ui/home/ChatHomeScreen.dart';
 import 'package:instachatty/model/ConversationModel.dart';
 import 'package:instachatty/model/HomeConversationModel.dart';
 import 'package:instachatty/model/User.dart';
@@ -19,7 +20,6 @@ List<HomeConversationModel> _conversations = [];
 
 class ConversationsScreen extends StatefulWidget {
   final User user;
-
   const ConversationsScreen({Key key, @required this.user}) : super(key: key);
 
   @override
@@ -30,6 +30,7 @@ class ConversationsScreen extends StatefulWidget {
 
 class _ConversationsState extends State<ConversationsScreen> {
   final User user;
+
   final fireStoreUtils = FireStoreUtils();
   Future<List<User>> _friendsFuture;
   Stream<List<HomeConversationModel>> _conversationsStream;
@@ -117,10 +118,22 @@ class _ConversationsState extends State<ConversationsScreen> {
                     );
                   } else if (!snap.hasData || snap.data.isEmpty) {
                     return Center(
-                      child: Text(
-                        'noFriendsFound',
-                        style: TextStyle(fontSize: 18),
-                      ).tr(),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'noFriendsFound',
+                            style: TextStyle(fontSize: 18),
+                          ).tr(),
+                          IconButton(
+                            icon: Icon(
+                              Icons.add_circle,
+                              color: Colors.grey,
+                            ),
+                            onPressed: () {},
+                          )
+                        ],
+                      ),
                     );
                   } else {
                     return _friendsSearchResult.isNotEmpty ||

@@ -20,6 +20,7 @@ import 'package:instachatty/ui/auth/AuthScreen.dart';
 import 'package:instachatty/ui/onBoarding/OnBoardingScreen.dart';
 import 'package:uuid/uuid.dart';
 import 'package:instachatty/model/Business.dart';
+import 'package:instachatty/ui/home/ChatHomeScreen.dart';
 
 final FlutterCallkeep callKeep = FlutterCallkeep();
 

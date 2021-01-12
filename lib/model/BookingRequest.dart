@@ -7,6 +7,8 @@ class BookingRequest {
   String customerUrl = User().profilePictureURL;
   String sellerId = Business().businessID;
   String sellerName = Business().businessName;
+  String details = "";
+  String requestID = "";
   bool handled = false;
 
   BookingRequest(
@@ -15,7 +17,9 @@ class BookingRequest {
       this.customerUrl,
       this.sellerId,
       this.sellerName,
-      this.handled});
+      this.handled,
+      this.details,
+      this.requestID});
 
   factory BookingRequest.fromJson(Map<String, dynamic> parsedJson) {
     return new BookingRequest(
@@ -26,6 +30,8 @@ class BookingRequest {
           Business.fromJson(parsedJson).businessID ?? Business().businessID,
       sellerName: Business.fromJson(parsedJson).businessName ?? '',
       handled: parsedJson['handled'] ?? false,
+      details: parsedJson['details'] ?? "",
+      requestID: parsedJson['requestID'] ?? "",
     );
   }
 
@@ -37,6 +43,8 @@ class BookingRequest {
       'seller': this.sellerId,
       'sellerName': this.sellerName,
       'handled': this.handled,
+      'details': this.details,
+      'requestID': this.requestID,
     };
   }
 }

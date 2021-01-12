@@ -11,6 +11,7 @@ import 'package:instachatty/model/HomeConversationModel.dart';
 import 'package:instachatty/model/User.dart';
 import 'package:instachatty/services/FirebaseHelper.dart';
 import 'package:instachatty/services/Helper.dart';
+import 'package:instachatty/ui/createGroup/CreateGroupScreen.dart';
 import 'package:instachatty/ui/contacts/ContactsScreen.dart';
 import 'package:instachatty/ui/conversations/ConversationsScreen.dart';
 import 'package:instachatty/ui/search/ConnectionSearchScreen.dart';
@@ -226,13 +227,11 @@ class _HomeState extends State<ChatHomeScreen>
                           letterSpacing: 1.0,
                         ),
                       ).tr(),
-                      leading: IconButton(
-                        icon: Icon(
-                          Icons.search,
-                          color: _drawerSelection == DrawerSelection.Search
-                              ? Colors.white
-                              : Color(COLOR_PRIMARY),
-                        ),
+                      leading: Icon(
+                        Icons.search,
+                        color: _drawerSelection == DrawerSelection.Search
+                            ? Colors.white
+                            : Color(COLOR_PRIMARY),
                       ),
                       contentPadding: LISTTILEPADDING,
                       onTap: () {
@@ -268,18 +267,15 @@ class _HomeState extends State<ChatHomeScreen>
             style: TextStyle(fontFamily: 'Bauhaus93'),
             textAlign: TextAlign.center,
           ),
+
           actions: <Widget>[
             HomeNavigator(
               icon: Icon(
-                LineIcons.diamond,
+                LineIcons.group,
                 color: Colors.white,
               ),
               onPressed: () {
-                Navigator.of(context).push(HomeNavigator.goToDrawer(
-                    ProfessionScreen(
-                      user: user,
-                    ),
-                    1.0));
+                _scaffoldKey.currentState.openEndDrawer();
               },
             ),
           ],
@@ -287,6 +283,7 @@ class _HomeState extends State<ChatHomeScreen>
               color: isDarkMode(context) ? Colors.grey.shade200 : Colors.white),
           centerTitle: true,
         ),
+        endDrawer: CreateGroupScreen(),
         body: _currentWidget,
       ),
     );

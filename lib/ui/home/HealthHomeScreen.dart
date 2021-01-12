@@ -15,6 +15,7 @@ import 'package:instachatty/ui/controlPanels/CustomerControlPanel.dart';
 import 'package:instachatty/ui/signUp/BusinessSignUpScreen.dart';
 import 'package:instachatty/ui/controlPanels/PartnerControlPanel.dart';
 import 'package:instachatty/model/Business.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 String img2 =
     "https://passivehouseplus.ie/media/k2/items/cache/fc5d9d8578a06f6d4c69c78df34d3f3a_XL.jpg?t=-62169984000";
@@ -110,7 +111,8 @@ class _HealthHomeState extends State<HealthHome>
         ),
         actions: [
           IconButton(
-            icon: Icon(LineIcons.diamond),
+            icon:
+                user.isPartner ? Icon(LineIcons.diamond) : Icon(LineIcons.lock),
             onPressed: () {
               _scaffoldKey.currentState.openEndDrawer();
             },
@@ -120,12 +122,7 @@ class _HealthHomeState extends State<HealthHome>
       drawer: CustomerControlPanel(
         user: user,
       ),
-      endDrawer: user.isPartner
-          ? PartnerControlPanel(
-              user: user,
-              business: business,
-            )
-          : BusinessSignUpScreen(user: user),
+      endDrawer: administrationScreenPicker(),
       body: Container(
         height: media.height,
         width: media.width,
@@ -313,5 +310,63 @@ class _HealthHomeState extends State<HealthHome>
         ),
       ),
     );
+  }
+
+  Widget administrationScreenPicker() {
+    if (user.isPartner) {
+      return business.isHealthBusiness
+          ? PartnerControlPanel(
+              user: user,
+              business: business,
+            )
+          : BusinessSignUpScreen(user: user);
+    } else {
+      return Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+          elevation: 16,
+          child: Container(
+            height: 160,
+            width: 350,
+            child: Padding(
+                padding: const EdgeInsets.only(
+                    top: 38.0, left: 16, right: 16, bottom: 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    Text(
+                      "You must be a Partner to continue.",
+                      style: TextStyle(
+                        fontSize: 15.0,
+                      ),
+                    ),
+                    Spacer(),
+                    Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                                          spacing: 30,
+                      children: <Widget>[
+                        FlatButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              'cancel',
+                              style: TextStyle(
+                                fontSize: 18,
+                              ),
+                            ).tr()),
+                        FlatButton(
+                            onPressed: () async {},
+                            child: Text('Confirm',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    color: Color(COLOR_PRIMARY)))),
+                      ],
+                    )
+                  ],
+                )),
+          ));
+    }
   }
 }

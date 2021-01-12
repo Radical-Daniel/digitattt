@@ -17,6 +17,7 @@ const PARTNERS = 'partners';
 const SOCIAL_GRAPH = 'social_graph';
 const SENT_INVOICES = 'outbound_invoice';
 const RECEIVED_INVOICES = 'inbound_invoices';
+const BOOKING_REQUESTS = 'booking_requests';
 const SENT_BOOKING_REQUESTS = 'outbound_booking_requests';
 const RECEIVED_BOOKING_REQUESTS = 'inbound_booking_requests';
 const RECEIVED_FRIEND_REQUESTS = 'inbound_users';

@@ -87,6 +87,15 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.popUntil(context, (ChatHomeScreen) => false);
+          },
+        ),
         actions: <Widget>[
           CALLS_ENABLED
               ? IconButton(

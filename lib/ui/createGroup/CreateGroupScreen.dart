@@ -113,8 +113,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                                                                 _groupNameController
                                                                     .text);
                                                     hideProgress();
-                                                    Navigator.pop(context);
-                                                    pushReplacement(
+                                                    push(
                                                         context,
                                                         ChatScreen(
                                                             homeConversationModel:

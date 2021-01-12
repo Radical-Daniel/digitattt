@@ -8,9 +8,27 @@ import 'package:instachatty/ui/post/home_post.dart';
 import 'package:instachatty/ui/booking/booking.dart';
 import 'package:instachatty/model/InvoiceModel.dart';
 import 'package:instachatty/ui/invoice/Invoice.dart';
+import 'package:instachatty/services/FirebaseHelper.dart';
+import 'package:instachatty/model/BookingRequest.dart';
+import 'package:instachatty/ui/booking/bookingRequests.dart';
+import 'package:instachatty/model/notifications.dart';
 
 Color color1 = Color(COLOR_PRIMARY);
 Color color2 = Color(COLOR_PRIMARY_DARK);
+
+void isShowingNotificationNum() {
+  Notifications.notifications['count'] > 0
+      ? Notifications.notifications['visible'] = true
+      : Notifications.notifications['visible'] = false;
+}
+
+void notificationCounter() {
+  Notifications.notifications['count']++;
+}
+
+void resetNotifications() {
+  Notifications.notifications['count'] = 0;
+}
 
 class CustomerControlPanel extends StatefulWidget {
   final User user;
@@ -23,9 +41,34 @@ class CustomerControlPanel extends StatefulWidget {
 class _CustomerControlPanelState extends State<CustomerControlPanel> {
   final User user;
   _CustomerControlPanelState(this.user);
+  final fireStoreUtils = FireStoreUtils();
+  Stream<List<BookingRequest>> _bookingRequestsStream;
+
+  @override
+  void initState() {
+    super.initState();
+    setupStream();
+  }
+
+  setupStream() {
+    _bookingRequestsStream =
+        fireStoreUtils.getBookingRequestsSent(user.userID).asBroadcastStream();
+    _bookingRequestsStream.listen((bookingRequestModel) {
+      if (mounted) {
+        setState(() {
+          isShowingNotificationNum();
+          notificationCounter();
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      Notifications.notifications['count'] = 0;
+      isShowingNotificationNum();
+    });
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
@@ -82,22 +125,25 @@ class _CustomerControlPanelState extends State<CustomerControlPanel> {
                         Icons.notifications_none,
                         color: Colors.white,
                       ),
-                      Positioned(
-                        top: 0,
-                        right: 2,
-                        child: Container(
-                          height: 13,
-                          width: 13,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.red,
-                          ),
-                          child: Text(
-                            "5",
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Colors.white,
+                      Visibility(
+                        visible: Notifications.notifications['visible'],
+                        child: Positioned(
+                          top: 0,
+                          right: 2,
+                          child: Container(
+                            height: 13,
+                            width: 13,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.red,
+                            ),
+                            child: Text(
+                              Notifications.notifications['count'].toString(),
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
@@ -267,175 +313,195 @@ class _CustomerControlPanelState extends State<CustomerControlPanel> {
       top: height * 0.30 + 34,
       child: Padding(
         padding: const EdgeInsets.only(right: 16, left: 16, top: 10),
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              Material(
-                elevation: 1,
-                color: Colors.white,
-                child: Column(
-                  children: <Widget>[
-                    buildBodyCardTitle(title: "Your Bookings"),
-                    Divider(
-                      height: 3,
-                      color: Colors.black87,
-                    ),
-                    Booking(
-                      invoice: InvoiceModel(
-                        customerName: user.fullName(),
-                        completed: false,
-                        customerUrl: user.profilePictureURL,
-                        invoiceId: 'fffa',
-                        status: PaymentStatus.paid,
-                        sellerName: 'Jane Doe',
-                        sellerId: 'qqqq',
-                        charge: 30.0,
-                      ),
-                      appointmentTime: DateTime.now(),
-                    ),
-                    Divider(
-                      height: 3,
-                      color: Colors.black87,
-                    ),
-                    Booking(
-                      invoice: InvoiceModel(
-                        customerName: user.fullName(),
-                        sellerName: 'Dr. Melissa Avon',
-                        customerUrl: user.profilePictureURL,
-                      ),
-                      appointmentTime: DateTime.now(),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 15),
-              Material(
-                elevation: 1,
-                color: Colors.white,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    buildBodyCardTitle(title: "Invoices"),
-                    Divider(
-                      height: 2,
-                      color: Colors.black87,
-                    ),
-                    InvoiceCard(
-                      details: InvoiceModel(
-                        customerId: "cccc",
-                        customerName: user.fullName(),
-                        customerUrl: user.profilePictureURL,
-                        charge: 100.00,
-                        completed: false,
-                        type: PaymentType.Electronic,
-                        sellerName: "Code Grease",
-                        sellerId: "gggg",
-                        status: PaymentStatus.paid,
-                        sellerUrl: user.profilePictureURL,
-                      ),
-                    )
-                    // ListTile(
-                    //   contentPadding: const EdgeInsets.only(
-                    //     left: 10,
-                    //     top: 10,
-                    //     bottom: 10,
-                    //   ),
-                    //   leading: Card(
-                    //     elevation: 2,
-                    //     child: Container(
-                    //       height: 70,
-                    //       width: 60,
-                    //       child: Column(
-                    //         mainAxisAlignment: MainAxisAlignment.center,
-                    //         children: <Widget>[
-                    //           Text(
-                    //             DateTime.now().month.toString(),
-                    //             style: TextStyle(
-                    //               fontWeight: FontWeight.bold,
-                    //               fontSize: 14,
-                    //             ),
-                    //           ),
-                    //           Text(
-                    //             "21",
-                    //             style: TextStyle(
-                    //               fontWeight: FontWeight.bold,
-                    //               fontSize: 18,
-                    //             ),
-                    //           ),
-                    //         ],
-                    //       ),
-                    //     ),
-                    //   ),
-                    //   title: Column(
-                    //     crossAxisAlignment: CrossAxisAlignment.start,
-                    //     mainAxisAlignment: MainAxisAlignment.start,
-                    //     children: <Widget>[
-                    //       Text(
-                    //         "Invoice 213",
-                    //         style: TextStyle(fontWeight: FontWeight.bold),
-                    //       ),
-                    //       Text(
-                    //         "This month fate fee",
-                    //         style: TextStyle(
-                    //           fontSize: 14,
-                    //           color: Colors.grey,
-                    //         ),
-                    //       ),
-                    //       Text(
-                    //         "PENDING",
-                    //         style: TextStyle(
-                    //           color: Colors.red,
-                    //           fontSize: 10,
-                    //           fontWeight: FontWeight.bold,
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    //   trailing: Container(
-                    //     height: 70,
-                    //     width: 80,
-                    //     padding: const EdgeInsets.only(right: 5),
-                    //     child: Column(
-                    //       mainAxisAlignment: MainAxisAlignment.center,
-                    //       crossAxisAlignment: CrossAxisAlignment.center,
-                    //       children: <Widget>[
-                    //         Text(
-                    //           "\$1200",
-                    //           style: TextStyle(
-                    //             fontWeight: FontWeight.bold,
-                    //             fontSize: 18,
-                    //           ),
-                    //         ),
-                    //         SizedBox(height: 2),
-                    //         Container(
-                    //           alignment: Alignment.center,
-                    //           height: 30,
-                    //           width: 80,
-                    //           decoration: BoxDecoration(
-                    //             borderRadius: BorderRadius.circular(20),
-                    //             color: Color(0xff1abcaa),
-                    //           ),
-                    //           child: Text(
-                    //             "PAY NOW",
-                    //             style: TextStyle(
-                    //               color: Colors.white,
-                    //               fontSize: 12,
-                    //               fontWeight: FontWeight.bold,
-                    //             ),
-                    //           ),
-                    //         )
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 50),
-            ],
-          ),
+        child: StreamBuilder(
+          stream: _bookingRequestsStream,
+          initialData: [BookingRequest()],
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              return ListView.builder(
+                itemCount: snapshot.data.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return BookingRequestCard(
+                    bookingRequest: snapshot.data[index],
+                  );
+                },
+              );
+            }
+          },
         ),
+        // SingleChildScrollView(
+        //   child: Column(
+        //     children: <Widget>[
+        //       Material(
+        //         elevation: 1,
+        //         color: Colors.white,
+        //         child: Column(
+        //           children: <Widget>[
+        //             buildBodyCardTitle(title: "Your Bookings"),
+        //             Divider(
+        //               height: 3,
+        //               color: Colors.black87,
+        //             ),
+        //             Booking(
+        //               invoice: InvoiceModel(
+        //                 customerName: user.fullName(),
+        //                 completed: false,
+        //                 customerUrl: user.profilePictureURL,
+        //                 invoiceId: 'fffa',
+        //                 status: PaymentStatus.paid,
+        //                 sellerName: 'Jane Doe',
+        //                 sellerId: 'qqqq',
+        //                 charge: 30.0,
+        //               ),
+        //               appointmentTime: DateTime.now(),
+        //             ),
+        //             Divider(
+        //               height: 3,
+        //               color: Colors.black87,
+        //             ),
+        //             Booking(
+        //               invoice: InvoiceModel(
+        //                 customerName: user.fullName(),
+        //                 sellerName: 'Dr. Melissa Avon',
+        //                 customerUrl: user.profilePictureURL,
+        //               ),
+        //               appointmentTime: DateTime.now(),
+        //             ),
+        //           ],
+        //         ),
+        //       ),
+        //       SizedBox(height: 15),
+        //       Material(
+        //         elevation: 1,
+        //         color: Colors.white,
+        //         child: Column(
+        //           mainAxisAlignment: MainAxisAlignment.end,
+        //           crossAxisAlignment: CrossAxisAlignment.center,
+        //           children: <Widget>[
+        //             buildBodyCardTitle(title: "Invoices"),
+        //             Divider(
+        //               height: 2,
+        //               color: Colors.black87,
+        //             ),
+        //             InvoiceCard(
+        //               details: InvoiceModel(
+        //                 customerId: "cccc",
+        //                 customerName: user.fullName(),
+        //                 customerUrl: user.profilePictureURL,
+        //                 charge: 100.00,
+        //                 completed: false,
+        //                 type: PaymentType.Electronic,
+        //                 sellerName: "Code Grease",
+        //                 sellerId: "gggg",
+        //                 status: PaymentStatus.paid,
+        //                 sellerUrl: user.profilePictureURL,
+        //               ),
+        //             )
+        //             // ListTile(
+        //             //   contentPadding: const EdgeInsets.only(
+        //             //     left: 10,
+        //             //     top: 10,
+        //             //     bottom: 10,
+        //             //   ),
+        //             //   leading: Card(
+        //             //     elevation: 2,
+        //             //     child: Container(
+        //             //       height: 70,
+        //             //       width: 60,
+        //             //       child: Column(
+        //             //         mainAxisAlignment: MainAxisAlignment.center,
+        //             //         children: <Widget>[
+        //             //           Text(
+        //             //             DateTime.now().month.toString(),
+        //             //             style: TextStyle(
+        //             //               fontWeight: FontWeight.bold,
+        //             //               fontSize: 14,
+        //             //             ),
+        //             //           ),
+        //             //           Text(
+        //             //             "21",
+        //             //             style: TextStyle(
+        //             //               fontWeight: FontWeight.bold,
+        //             //               fontSize: 18,
+        //             //             ),
+        //             //           ),
+        //             //         ],
+        //             //       ),
+        //             //     ),
+        //             //   ),
+        //             //   title: Column(
+        //             //     crossAxisAlignment: CrossAxisAlignment.start,
+        //             //     mainAxisAlignment: MainAxisAlignment.start,
+        //             //     children: <Widget>[
+        //             //       Text(
+        //             //         "Invoice 213",
+        //             //         style: TextStyle(fontWeight: FontWeight.bold),
+        //             //       ),
+        //             //       Text(
+        //             //         "This month fate fee",
+        //             //         style: TextStyle(
+        //             //           fontSize: 14,
+        //             //           color: Colors.grey,
+        //             //         ),
+        //             //       ),
+        //             //       Text(
+        //             //         "PENDING",
+        //             //         style: TextStyle(
+        //             //           color: Colors.red,
+        //             //           fontSize: 10,
+        //             //           fontWeight: FontWeight.bold,
+        //             //         ),
+        //             //       ),
+        //             //     ],
+        //             //   ),
+        //             //   trailing: Container(
+        //             //     height: 70,
+        //             //     width: 80,
+        //             //     padding: const EdgeInsets.only(right: 5),
+        //             //     child: Column(
+        //             //       mainAxisAlignment: MainAxisAlignment.center,
+        //             //       crossAxisAlignment: CrossAxisAlignment.center,
+        //             //       children: <Widget>[
+        //             //         Text(
+        //             //           "\$1200",
+        //             //           style: TextStyle(
+        //             //             fontWeight: FontWeight.bold,
+        //             //             fontSize: 18,
+        //             //           ),
+        //             //         ),
+        //             //         SizedBox(height: 2),
+        //             //         Container(
+        //             //           alignment: Alignment.center,
+        //             //           height: 30,
+        //             //           width: 80,
+        //             //           decoration: BoxDecoration(
+        //             //             borderRadius: BorderRadius.circular(20),
+        //             //             color: Color(0xff1abcaa),
+        //             //           ),
+        //             //           child: Text(
+        //             //             "PAY NOW",
+        //             //             style: TextStyle(
+        //             //               color: Colors.white,
+        //             //               fontSize: 12,
+        //             //               fontWeight: FontWeight.bold,
+        //             //             ),
+        //             //           ),
+        //             //         )
+        //             //       ],
+        //             //     ),
+        //             //   ),
+        //             // ),
+        //           ],
+        //         ),
+        //       ),
+        //       SizedBox(height: 50),
+        //     ],
+        //   ),
+        // ),
       ),
     );
   }

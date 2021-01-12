@@ -21,6 +21,7 @@ import 'package:instachatty/model/MessageData.dart';
 import 'package:instachatty/model/ChatVideoContainer.dart';
 import 'package:instachatty/ui/controlPanels/CustomerControlPanel.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:instachatty/model/notifications.dart';
 
 List<Business> _searchResult = [];
 Map<String, dynamic> _filterList = {
@@ -118,14 +119,35 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
         key: _scaffoldKey,
         drawer: CustomerControlPanel(user: user),
         appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(
-              LineIcons.bell,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              _scaffoldKey.currentState.openDrawer();
-            },
+          leading: Stack(
+            children: [
+              IconButton(
+                icon: Icon(LineIcons.bell),
+                onPressed: () {
+                  _scaffoldKey.currentState.openDrawer();
+                },
+              ),
+              Positioned(
+                top: 13,
+                right: 24,
+                child: Container(
+                  height: 13,
+                  width: 13,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.red,
+                  ),
+                  child: Text(
+                    Notifications.notifications['count'].toString(),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              )
+            ],
           ),
           centerTitle: true,
           backgroundColor: Color(COLOR_PRIMARY),
@@ -350,218 +372,99 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                 .getChannelByIdOrNull(
                                                     channelID);
                                         List<Card> createServiceCards() {
-                                          List<Card> serviceCards =
-                                              business.servicesMap.services.keys
-                                                  .where((service) =>
-                                                      business.servicesMap
-                                                              .services[service]
-                                                          ['provides'] ==
-                                                      true)
-                                                  .map((service) => Card(
-                                                        margin: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal:
-                                                                    10.0),
-                                                        color: Colors.white70,
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .symmetric(
-                                                                  horizontal:
-                                                                      28.0,
-                                                                  vertical:
-                                                                      10.0),
-                                                          child: Column(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceEvenly,
-                                                            children: [
-                                                              Text(
-                                                                service,
-                                                                style: TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                              ),
-                                                              Padding(
-                                                                padding: const EdgeInsets
+                                          List<Card> serviceCards = business
+                                              .servicesMap.services.keys
+                                              .where((service) =>
+                                                  business.servicesMap
+                                                          .services[service]
+                                                      ['provides'] ==
+                                                  true)
+                                              .map((service) => Card(
+                                                    margin:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 10.0),
+                                                    color: Colors.white70,
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          horizontal: 28.0,
+                                                          vertical: 10.0),
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceEvenly,
+                                                        children: [
+                                                          Text(
+                                                            service,
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
                                                                         .symmetric(
                                                                     horizontal:
                                                                         18.0,
                                                                     vertical:
                                                                         5.0),
-                                                                child:
-                                                                    Image.asset(
-                                                                  'assets/images/$service.png',
-                                                                  width: 50.0,
-                                                                  height: 50.0,
-                                                                ),
+                                                            child: Image.asset(
+                                                              'assets/images/$service.png',
+                                                              width: 50.0,
+                                                              height: 50.0,
+                                                            ),
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              Icon(
+                                                                Icons.star,
+                                                                color: Colors
+                                                                    .orange,
                                                               ),
-                                                              Row(
-                                                                children: [
-                                                                  Icon(
-                                                                    Icons.star,
-                                                                    color: Colors
-                                                                        .orange,
-                                                                  ),
-                                                                  Text(
-                                                                    business
-                                                                        .servicesMap
-                                                                        .services[
-                                                                            service]
-                                                                            [
-                                                                            'rating']
-                                                                        .toString(),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              RaisedButton(
-                                                                color: Color(
-                                                                    COLOR_PRIMARY),
-                                                                child: Text(
-                                                                  "Select",
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .white),
-                                                                ),
-                                                                onPressed: () {
-                                                                  showDialog(
-                                                                      context:
-                                                                          context,
-                                                                      builder:
-                                                                          (context) {
-                                                                        return Dialog(
-                                                                            shape:
-                                                                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-                                                                            elevation: 16,
-                                                                            child: Container(
-                                                                              height: 200,
-                                                                              width: 350,
-                                                                              child: Padding(
-                                                                                  padding: const EdgeInsets.only(top: 40.0, left: 16, right: 16, bottom: 16),
-                                                                                  child: Column(
-                                                                                    mainAxisSize: MainAxisSize.max,
-                                                                                    children: <Widget>[
-                                                                                      Padding(
-                                                                                        padding: const EdgeInsets.only(top: 8.0),
-                                                                                        child: Row(
-                                                                                          children: <Widget>[
-                                                                                            IconButton(
-                                                                                              onPressed: () {},
-                                                                                              icon: Icon(
-                                                                                                Icons.camera_alt,
-                                                                                                color: Color(COLOR_PRIMARY),
-                                                                                              ),
-                                                                                            ),
-                                                                                            Expanded(
-                                                                                                child: Padding(
-                                                                                                    padding: const EdgeInsets.only(left: 2.0, right: 2, top: 5.0),
-                                                                                                    child: Container(
-                                                                                                      padding: EdgeInsets.all(2),
-                                                                                                      decoration: ShapeDecoration(
-                                                                                                        shape: OutlineInputBorder(
-                                                                                                            borderRadius: BorderRadius.all(
-                                                                                                              Radius.circular(360),
-                                                                                                            ),
-                                                                                                            borderSide: BorderSide(style: BorderStyle.none)),
-                                                                                                        color: isDarkMode(context) ? Colors.grey[700] : Colors.grey.shade200,
-                                                                                                      ),
-                                                                                                      child: Row(
-                                                                                                        children: <Widget>[
-                                                                                                          InkWell(
-                                                                                                            onTap: () => {},
-                                                                                                            child: Icon(
-                                                                                                              Icons.mic,
-                                                                                                              // color: currentRecordingState == RecordingState.HIDDEN ? Color(COLOR_PRIMARY) : Colors.red,
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                          Expanded(
-                                                                                                            child: TextField(
-                                                                                                              onChanged: (s) {
-                                                                                                                setState(() {});
-                                                                                                              },
-                                                                                                              onTap: () {
-                                                                                                                setState(() {
-                                                                                                                  // currentRecordingState = RecordingState.HIDDEN;
-                                                                                                                });
-                                                                                                              },
-                                                                                                              textAlignVertical: TextAlignVertical.center,
-                                                                                                              controller: _messageController,
-                                                                                                              decoration: InputDecoration(
-                                                                                                                isDense: true,
-                                                                                                                contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                                                                                                                hintText: 'startTyping'.tr(),
-                                                                                                                hintStyle: TextStyle(color: Colors.grey[400]),
-                                                                                                                focusedBorder: OutlineInputBorder(
-                                                                                                                    borderRadius: BorderRadius.all(
-                                                                                                                      Radius.circular(360),
-                                                                                                                    ),
-                                                                                                                    borderSide: BorderSide(style: BorderStyle.none)),
-                                                                                                                enabledBorder: OutlineInputBorder(
-                                                                                                                    borderRadius: BorderRadius.all(
-                                                                                                                      Radius.circular(360),
-                                                                                                                    ),
-                                                                                                                    borderSide: BorderSide(style: BorderStyle.none)),
-                                                                                                              ),
-                                                                                                              textCapitalization: TextCapitalization.sentences,
-                                                                                                              maxLines: 5,
-                                                                                                              minLines: 1,
-                                                                                                              keyboardType: TextInputType.multiline,
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                        ],
-                                                                                                      ),
-                                                                                                    ))),
-                                                                                            // IconButton(
-                                                                                            //     icon: Icon(
-                                                                                            //       Icons.send,
-                                                                                            //       color: _messageController.text.isEmpty ? Color(COLOR_PRIMARY).withOpacity(.5) : Color(COLOR_PRIMARY),
-                                                                                            //     ),
-                                                                                            //     onPressed: () async {
-                                                                                            //       if (_messageController.text.isNotEmpty) {
-                                                                                            //         // _sendMessage(_messageController.text, Url(mime: '', url: ''), '');
-                                                                                            //         _messageController.clear();
-                                                                                            //         setState(() {});
-                                                                                            //       }
-                                                                                            //     })
-                                                                                          ],
-                                                                                        ),
-                                                                                      ),
-                                                                                      Spacer(),
-                                                                                      Row(
-//                                          spacing: 30,
-                                                                                        children: <Widget>[
-                                                                                          FlatButton(
-                                                                                              onPressed: () {
-                                                                                                Navigator.pop(context);
-                                                                                              },
-                                                                                              child: Text(
-                                                                                                'cancel',
-                                                                                                style: TextStyle(
-                                                                                                  fontSize: 18,
-                                                                                                ),
-                                                                                              ).tr()),
-                                                                                          FlatButton(
-                                                                                              onPressed: () async {
-                                                                                                details.length > 0 ? _sendToServer(business, details) : print("make second thing");
-                                                                                                setState(() {
-                                                                                                  details = "";
-                                                                                                });
-                                                                                              },
-                                                                                              child: Text('Submit', style: TextStyle(fontSize: 18, color: Color(COLOR_PRIMARY)))),
-                                                                                        ],
-                                                                                      )
-                                                                                    ],
-                                                                                  )),
-                                                                            ));
-                                                                      });
-                                                                },
+                                                              Text(
+                                                                business
+                                                                    .servicesMap
+                                                                    .services[
+                                                                        service]
+                                                                        [
+                                                                        'rating']
+                                                                    .toString(),
                                                               ),
                                                             ],
                                                           ),
-                                                        ),
-                                                      ))
-                                                  .toList();
+                                                          FlatButton(
+                                                              onPressed:
+                                                                  () async {
+                                                                _messageController
+                                                                            .text
+                                                                            .length >
+                                                                        0
+                                                                    ? _sendToServer(
+                                                                        business,
+                                                                        _messageController
+                                                                            .text,
+                                                                        service)
+                                                                    : print(
+                                                                        "make second thing");
+                                                                setState(() {
+                                                                  details = "";
+                                                                  _messageController
+                                                                      .text = '';
+                                                                });
+                                                              },
+                                                              child: Text(
+                                                                  'Submit',
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          18,
+                                                                      color: Color(
+                                                                          COLOR_PRIMARY)))),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ))
+                                              .toList();
 
                                           return serviceCards;
                                         }
@@ -821,15 +724,89 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                                                 child: Column(
                                                                                   mainAxisSize: MainAxisSize.max,
                                                                                   children: <Widget>[
-                                                                                    TextField(
-                                                                                      textInputAction: TextInputAction.done,
-                                                                                      keyboardType: TextInputType.text,
-                                                                                      textCapitalization: TextCapitalization.sentences,
-                                                                                      controller: requestDetailsController,
-                                                                                      decoration: InputDecoration(
-                                                                                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(25.0), borderSide: BorderSide(color: Color(COLOR_PRIMARY), width: 2.0)),
-                                                                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(25.0)),
-                                                                                        labelText: 'Details',
+                                                                                    Padding(
+                                                                                      padding: const EdgeInsets.only(top: 8.0),
+                                                                                      child: Row(
+                                                                                        children: <Widget>[
+                                                                                          IconButton(
+                                                                                            onPressed: () {},
+                                                                                            icon: Icon(
+                                                                                              Icons.camera_alt,
+                                                                                              color: Color(COLOR_PRIMARY),
+                                                                                            ),
+                                                                                          ),
+                                                                                          Expanded(
+                                                                                              child: Padding(
+                                                                                                  padding: const EdgeInsets.only(left: 2.0, right: 2, top: 5.0),
+                                                                                                  child: Container(
+                                                                                                    padding: EdgeInsets.all(2),
+                                                                                                    decoration: ShapeDecoration(
+                                                                                                      shape: OutlineInputBorder(
+                                                                                                          borderRadius: BorderRadius.all(
+                                                                                                            Radius.circular(360),
+                                                                                                          ),
+                                                                                                          borderSide: BorderSide(style: BorderStyle.none)),
+                                                                                                      color: isDarkMode(context) ? Colors.grey[700] : Colors.grey.shade200,
+                                                                                                    ),
+                                                                                                    child: Row(
+                                                                                                      children: <Widget>[
+                                                                                                        InkWell(
+                                                                                                          onTap: () => {},
+                                                                                                          child: Icon(
+                                                                                                            Icons.mic,
+                                                                                                            // color: currentRecordingState == RecordingState.HIDDEN ? Color(COLOR_PRIMARY) : Colors.red,
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                        Expanded(
+                                                                                                          child: TextField(
+                                                                                                            onChanged: (s) {
+                                                                                                              setState(() {});
+                                                                                                            },
+                                                                                                            onTap: () {
+                                                                                                              setState(() {
+                                                                                                                // currentRecordingState = RecordingState.HIDDEN;
+                                                                                                              });
+                                                                                                            },
+                                                                                                            textAlignVertical: TextAlignVertical.center,
+                                                                                                            controller: _messageController,
+                                                                                                            decoration: InputDecoration(
+                                                                                                              isDense: true,
+                                                                                                              contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                                                                                              hintText: 'Details',
+                                                                                                              hintStyle: TextStyle(color: Colors.grey[400]),
+                                                                                                              focusedBorder: OutlineInputBorder(
+                                                                                                                  borderRadius: BorderRadius.all(
+                                                                                                                    Radius.circular(360),
+                                                                                                                  ),
+                                                                                                                  borderSide: BorderSide(style: BorderStyle.none)),
+                                                                                                              enabledBorder: OutlineInputBorder(
+                                                                                                                  borderRadius: BorderRadius.all(
+                                                                                                                    Radius.circular(360),
+                                                                                                                  ),
+                                                                                                                  borderSide: BorderSide(style: BorderStyle.none)),
+                                                                                                            ),
+                                                                                                            textCapitalization: TextCapitalization.sentences,
+                                                                                                            maxLines: 5,
+                                                                                                            minLines: 1,
+                                                                                                            keyboardType: TextInputType.multiline,
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                      ],
+                                                                                                    ),
+                                                                                                  ))),
+                                                                                          // IconButton(
+                                                                                          //     icon: Icon(
+                                                                                          //       Icons.send,
+                                                                                          //       color: _messageController.text.isEmpty ? Color(COLOR_PRIMARY).withOpacity(.5) : Color(COLOR_PRIMARY),
+                                                                                          //     ),
+                                                                                          //     onPressed: () async {
+                                                                                          //       if (_messageController.text.isNotEmpty) {
+                                                                                          //         // _sendMessage(_messageController.text, Url(mime: '', url: ''), '');
+                                                                                          //         _messageController.clear();
+                                                                                          //         setState(() {});
+                                                                                          //       }
+                                                                                          //     })
+                                                                                        ],
                                                                                       ),
                                                                                     ),
                                                                                     Spacer(),
@@ -846,7 +823,15 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                                                                 fontSize: 18,
                                                                                               ),
                                                                                             ).tr()),
-                                                                                        FlatButton(onPressed: () async {}, child: Text('Submit', style: TextStyle(fontSize: 18, color: Color(COLOR_PRIMARY)))),
+                                                                                        FlatButton(
+                                                                                            onPressed: () async {
+                                                                                              _messageController.text.length > 0 ? _sendToServer(business, _messageController.text, service) : print("make second thing");
+                                                                                              setState(() {
+                                                                                                details = "";
+                                                                                                _messageController.text = '';
+                                                                                              });
+                                                                                            },
+                                                                                            child: Text('Submit', style: TextStyle(fontSize: 18, color: Color(COLOR_PRIMARY)))),
                                                                                       ],
                                                                                     )
                                                                                   ],
@@ -1074,18 +1059,19 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
   //   }
   // }
 
-  _sendToServer(business, detail) async {
+  _sendToServer(business, detail, serviceName) async {
     showProgress(context, 'Creating request', false);
     String requestID = uuid.v4();
     try {
       BookingRequest bookingRequest = BookingRequest(
         details: detail,
-        customerId: user.userID,
+        customerID: user.userID,
         customerName: user.fullName(),
         customerUrl: user.profilePictureURL,
-        sellerId: business.businessID,
+        sellerID: business.businessID,
         sellerName: business.businessName,
         handled: false,
+        serviceName: serviceName,
         requestID: requestID,
       );
       await FireStoreUtils.firestore

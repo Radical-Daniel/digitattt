@@ -16,6 +16,7 @@ import 'package:instachatty/ui/signUp/BusinessSignUpScreen.dart';
 import 'package:instachatty/ui/controlPanels/PartnerControlPanel.dart';
 import 'package:instachatty/model/Business.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:instachatty/model/notifications.dart';
 
 String img2 =
     "https://passivehouseplus.ie/media/k2/items/cache/fc5d9d8578a06f6d4c69c78df34d3f3a_XL.jpg?t=-62169984000";
@@ -99,7 +100,7 @@ class _HealthHomeState extends State<HealthHome>
                   color: Colors.red,
                 ),
                 child: Text(
-                  "5",
+                  Notifications.notifications['count'].toString(),
                   style: TextStyle(
                     fontSize: 10,
                     color: Colors.white,
@@ -313,8 +314,8 @@ class _HealthHomeState extends State<HealthHome>
   }
 
   Widget administrationScreenPicker() {
-    if (user.isPartner) {
-      return business.isHealthBusiness
+    if (user.partnerEnabled) {
+      return user.isPartner
           ? PartnerControlPanel(
               user: user,
               business: business,
@@ -357,7 +358,12 @@ class _HealthHomeState extends State<HealthHome>
                               ),
                             ).tr()),
                         FlatButton(
-                            onPressed: () async {},
+                            onPressed: () async {
+                              user.partnerEnabled = true;
+                              FireStoreUtils.updateUserState(user);
+                              print("alrighty then");
+                              Navigator.pop(context);
+                            },
                             child: Text('Confirm',
                                 style: TextStyle(
                                     fontSize: 18,

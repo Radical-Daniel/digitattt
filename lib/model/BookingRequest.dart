@@ -2,48 +2,51 @@ import 'package:instachatty/model/User.dart';
 import 'package:instachatty/model/Business.dart';
 
 class BookingRequest {
-  String customerId = User().userID;
-  String customerName = User().fullName();
-  String customerUrl = User().profilePictureURL;
-  String sellerId = Business().businessID;
-  String sellerName = Business().businessName;
+  String customerID = '';
+  String customerName = '';
+  String customerUrl = '';
+  String sellerID = '';
+  String sellerName = '';
   String details = "";
   String requestID = "";
+  String serviceName = "";
   bool handled = false;
 
   BookingRequest(
-      {this.customerId,
+      {this.customerID,
       this.customerName,
       this.customerUrl,
-      this.sellerId,
+      this.sellerID,
       this.sellerName,
       this.handled,
       this.details,
+      this.serviceName,
       this.requestID});
 
   factory BookingRequest.fromJson(Map<String, dynamic> parsedJson) {
     return new BookingRequest(
-      customerId: User.fromJson(parsedJson).userID ?? User().userID,
-      customerName: User.fromJson(parsedJson).fullName() ?? User().fullName(),
-      customerUrl: User.fromJson(parsedJson).profilePictureURL ?? '',
-      sellerId:
-          Business.fromJson(parsedJson).businessID ?? Business().businessID,
-      sellerName: Business.fromJson(parsedJson).businessName ?? '',
+      customerID: parsedJson['customerID'] ?? '',
+      customerName: parsedJson['customerName'] ?? '',
+      customerUrl: parsedJson['customerUrl'] ?? '',
+      sellerID: parsedJson['sellerID'] ?? "",
+      sellerName: parsedJson['sellerName'] ?? '',
       handled: parsedJson['handled'] ?? false,
       details: parsedJson['details'] ?? "",
+      serviceName: parsedJson['serviceName'] ?? "",
       requestID: parsedJson['requestID'] ?? "",
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'customerId': this.customerId,
+      'customerID': this.customerID,
       'customerName': this.customerName,
       'customerUrl': this.customerUrl,
-      'seller': this.sellerId,
+      'sellerID': this.sellerID,
       'sellerName': this.sellerName,
       'handled': this.handled,
       'details': this.details,
+      'serviceName': this.serviceName,
       'requestID': this.requestID,
     };
   }

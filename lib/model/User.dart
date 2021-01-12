@@ -18,6 +18,7 @@ class User with ChangeNotifier {
   InterestMap interestMap = InterestMap();
   String appIdentifier = 'Flutter Instachatty ${Platform.operatingSystem}';
   bool isPartner = false;
+  bool partnerEnabled = false;
   List<dynamic> businessAffiliations = ["none"];
   User(
       {this.email,
@@ -32,6 +33,7 @@ class User with ChangeNotifier {
       this.userID,
       this.profilePictureURL,
       this.isPartner,
+      this.partnerEnabled,
       this.businessAffiliations});
 
   String fullName() {
@@ -53,6 +55,7 @@ class User with ChangeNotifier {
         userID: parsedJson['id'] ?? parsedJson['userID'] ?? '',
         profilePictureURL: parsedJson['profilePictureURL'] ?? "",
         isPartner: parsedJson['isPartner'] ?? false,
+        partnerEnabled: parsedJson['partnerEnabled'] ?? false,
         businessAffiliations: parsedJson['businessAffiliations'] ?? ['none'],
         interestMap: InterestMap.fromJson(parsedJson['interestMap'] ??
             {
@@ -91,6 +94,7 @@ class User with ChangeNotifier {
       'fcmToken': this.fcmToken,
       'profilePictureURL': this.profilePictureURL,
       'isPartner': this.isPartner ?? false,
+      'partnerEnabled': this.partnerEnabled ?? false,
       'businessAffiliations': this.businessAffiliations,
       'interestMap': this.interestMap.toJson(),
       'appIdentifier': this.appIdentifier

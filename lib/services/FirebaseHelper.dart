@@ -37,6 +37,8 @@ class FireStoreUtils {
   List<User> receivedRequests = [];
   List<ContactModel> contactsList = [];
   StreamController<List<HomeConversationModel>> conversationsStream;
+  StreamController<List<BookingRequest>> sentBookingReviewsStream;
+  List<BookingRequest> sentBookingReviews = [];
   List<HomeConversationModel> homeConversations = [];
   List<BlockUserModel> blockedList = [];
 
@@ -550,6 +552,35 @@ class FireStoreUtils {
     yield* conversationsStream.stream;
   }
 
+  Stream<List<BookingRequest>> getBookingRequestsSent(String userID) async* {
+    sentBookingReviewsStream = StreamController<List<BookingRequest>>();
+    firestore
+        .collection(BOOKING_REQUESTS)
+        .document(userID)
+        .collection(SENT_BOOKING_REQUESTS)
+        .snapshots()
+        .listen((querySnapshot) {
+      print(querySnapshot.documents.first.data);
+      if (querySnapshot.documents.isEmpty) {
+        sentBookingReviewsStream.sink.add(sentBookingReviews);
+      } else {
+        if (sentBookingReviews.isNotEmpty) {
+          sentBookingReviews.clear();
+        }
+        Future.forEach(querySnapshot.documents, (DocumentSnapshot document) {
+          if (document != null && document.exists) {
+            BookingRequest bookingRequest =
+                BookingRequest.fromJson(document.data);
+            sentBookingReviews.add(bookingRequest);
+            sentBookingReviewsStream.sink.add(sentBookingReviews);
+          }
+        });
+      }
+    });
+
+    yield* sentBookingReviewsStream.stream;
+  }
+
   Stream<List<User>> getGroupMembers(String channelID) async* {
     StreamController<List<User>> membersStreamController = StreamController();
     getGroupMembersIDs(channelID).listen((memberIDs) {
@@ -660,58 +691,6 @@ class FireStoreUtils {
     }
     yield* chatModelStreamController.stream;
   }
-
-  // Stream<BookingRequest> getBookingRequests(
-  //     HomeConversationModel homeConversationModel) async* {
-  //   StreamController<BookingRequest> chatModelStreamController =
-  //       StreamController();
-  //   BookingRequest bookingRequest = BookingRequest();
-  //   List<MessageData> listOfMessages = [];
-  //
-  //   if (homeConversationModel.isGroupChat) {
-  //     homeConversationModel.members.forEach((groupMember) {
-  //       if (groupMember.userID != MyAppState.currentUser.userID) {
-  //         getUserByID(groupMember.userID).listen((updatedUser) {
-  //           for (int i = 0; i < listOfMembers.length; i++) {
-  //             if (listOfMembers[i].userID == updatedUser.userID) {
-  //               listOfMembers[i] = updatedUser;
-  //             }
-  //           }
-  //           chatModel.message = listOfMessages;
-  //           chatModel.members = listOfMembers;
-  //           chatModelStreamController.sink.add(chatModel);
-  //         });
-  //       }
-  //     });
-  //   } else {
-  //     User friend = homeConversationModel.members.first;
-  //     getUserByID(friend.userID).listen((user) {
-  //       listOfMembers.clear();
-  //       listOfMembers.add(user);
-  //       chatModel.message = listOfMessages;
-  //       chatModel.members = listOfMembers;
-  //       chatModelStreamController.sink.add(chatModel);
-  //     });
-  //   }
-  //   if (homeConversationModel.conversationModel != null) {
-  //     firestore
-  //         .collection(CHANNELS)
-  //         .document(homeConversationModel.conversationModel.id)
-  //         .collection(THREAD)
-  //         .orderBy('createdAt', descending: true)
-  //         .snapshots()
-  //         .listen((onData) {
-  //       listOfMessages.clear();
-  //       onData.documents.forEach((document) {
-  //         listOfMessages.add(MessageData.fromJson(document.data));
-  //       });
-  //       chatModel.message = listOfMessages;
-  //       chatModel.members = listOfMembers;
-  //       chatModelStreamController.sink.add(chatModel);
-  //     });
-  //   }
-  //   yield* chatModelStreamController.stream;
-  // }
 
   Future<void> sendMessage(
       List<User> members,

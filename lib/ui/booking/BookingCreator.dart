@@ -97,10 +97,10 @@ class _SignUpState extends State<BookingCreator> {
     showProgress(context, 'Creating request', false);
     try {
       BookingRequest bookingRequest = BookingRequest(
-        customerId: user.userID,
+        customerID: user.userID,
         customerName: user.fullName(),
         customerUrl: user.profilePictureURL,
-        sellerId: business.businessID,
+        sellerID: business.businessID,
         sellerName: business.businessName,
         handled: false,
       );

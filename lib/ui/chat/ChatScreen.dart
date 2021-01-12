@@ -93,7 +93,7 @@ class _ChatScreenState extends State<ChatScreen> {
             color: Colors.white,
           ),
           onPressed: () {
-            Navigator.popUntil(context, (ChatHomeScreen) => false);
+            // Navigator.popUntil(context, (ChatHomeScreen) => false);
           },
         ),
         actions: <Widget>[

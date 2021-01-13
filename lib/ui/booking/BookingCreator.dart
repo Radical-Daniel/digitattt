@@ -99,7 +99,7 @@ class _SignUpState extends State<BookingCreator> {
       BookingRequest bookingRequest = BookingRequest(
         customerID: user.userID,
         customerName: user.fullName(),
-        customerUrl: user.profilePictureURL,
+        customerURL: user.profilePictureURL,
         sellerID: business.businessID,
         sellerName: business.businessName,
         handled: false,

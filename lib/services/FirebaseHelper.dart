@@ -38,7 +38,9 @@ class FireStoreUtils {
   List<ContactModel> contactsList = [];
   StreamController<List<HomeConversationModel>> conversationsStream;
   StreamController<List<BookingRequest>> sentBookingReviewsStream;
+  StreamController<List<BookingRequest>> receivedBookingReviewsStream;
   List<BookingRequest> sentBookingReviews = [];
+  List<BookingRequest> receivedBookingReviews = [];
   List<HomeConversationModel> homeConversations = [];
   List<BlockUserModel> blockedList = [];
 
@@ -579,6 +581,36 @@ class FireStoreUtils {
     });
 
     yield* sentBookingReviewsStream.stream;
+  }
+
+  Stream<List<BookingRequest>> getBookingRequestsReceived(
+      String userID) async* {
+    receivedBookingReviewsStream = StreamController<List<BookingRequest>>();
+    firestore
+        .collection(BOOKING_REQUESTS)
+        .document(userID)
+        .collection(RECEIVED_BOOKING_REQUESTS)
+        .snapshots()
+        .listen((querySnapshot) {
+      print(querySnapshot.documents.first.data);
+      if (querySnapshot.documents.isEmpty) {
+        receivedBookingReviewsStream.sink.add(receivedBookingReviews);
+      } else {
+        if (receivedBookingReviews.isNotEmpty) {
+          receivedBookingReviews.clear();
+        }
+        Future.forEach(querySnapshot.documents, (DocumentSnapshot document) {
+          if (document != null && document.exists) {
+            BookingRequest bookingRequest =
+                BookingRequest.fromJson(document.data);
+            receivedBookingReviews.add(bookingRequest);
+            receivedBookingReviewsStream.sink.add(receivedBookingReviews);
+          }
+        });
+      }
+    });
+
+    yield* receivedBookingReviewsStream.stream;
   }
 
   Stream<List<User>> getGroupMembers(String channelID) async* {

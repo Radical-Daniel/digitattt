@@ -4,10 +4,12 @@ import 'package:instachatty/model/Business.dart';
 class BookingRequest {
   String customerID = '';
   String customerName = '';
-  String customerUrl = '';
+  String customerURL = '';
   String sellerID = '';
   String sellerName = '';
+  String sellerURL = '';
   String details = "";
+  String pictureDetailsURL = "";
   String requestID = "";
   String serviceName = "";
   bool handled = false;
@@ -15,11 +17,13 @@ class BookingRequest {
   BookingRequest(
       {this.customerID,
       this.customerName,
-      this.customerUrl,
+      this.customerURL,
       this.sellerID,
       this.sellerName,
+      this.sellerURL,
       this.handled,
       this.details,
+      this.pictureDetailsURL,
       this.serviceName,
       this.requestID});
 
@@ -27,11 +31,13 @@ class BookingRequest {
     return new BookingRequest(
       customerID: parsedJson['customerID'] ?? '',
       customerName: parsedJson['customerName'] ?? '',
-      customerUrl: parsedJson['customerUrl'] ?? '',
+      customerURL: parsedJson['customerURL'] ?? '',
       sellerID: parsedJson['sellerID'] ?? "",
       sellerName: parsedJson['sellerName'] ?? '',
+      sellerURL: parsedJson['sellerURL'] ?? "",
       handled: parsedJson['handled'] ?? false,
       details: parsedJson['details'] ?? "",
+      pictureDetailsURL: parsedJson['pictureDetailsURL'] ?? '',
       serviceName: parsedJson['serviceName'] ?? "",
       requestID: parsedJson['requestID'] ?? "",
     );
@@ -41,11 +47,13 @@ class BookingRequest {
     return {
       'customerID': this.customerID,
       'customerName': this.customerName,
-      'customerUrl': this.customerUrl,
+      'customerURL': this.customerURL,
       'sellerID': this.sellerID,
       'sellerName': this.sellerName,
+      'sellerURL': this.sellerURL,
       'handled': this.handled,
       'details': this.details,
+      'pictureDetailsURL': this.pictureDetailsURL,
       'serviceName': this.serviceName,
       'requestID': this.requestID,
     };

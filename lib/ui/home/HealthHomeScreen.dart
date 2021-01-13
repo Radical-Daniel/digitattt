@@ -13,10 +13,11 @@ import 'package:easy_popup/easy_popup.dart';
 import 'package:instachatty/ui/post/home_post.dart';
 import 'package:instachatty/ui/controlPanels/CustomerControlPanel.dart';
 import 'package:instachatty/ui/signUp/BusinessSignUpScreen.dart';
-import 'package:instachatty/ui/controlPanels/PartnerControlPanel.dart';
+import 'package:instachatty/ui/controlPanels/oldPartnerControlPanel.dart';
 import 'package:instachatty/model/Business.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:instachatty/model/notifications.dart';
+import 'package:instachatty/ui/controlPanels/PartnerControlPanel.dart';
 
 String img2 =
     "https://passivehouseplus.ie/media/k2/items/cache/fc5d9d8578a06f6d4c69c78df34d3f3a_XL.jpg?t=-62169984000";

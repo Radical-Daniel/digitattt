@@ -1,26 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:instachatty/constants.dart';
 import 'package:instachatty/model/User.dart';
-import 'package:instachatty/ui/booking/booking.dart';
-import 'package:instachatty/model/InvoiceModel.dart';
-import 'package:instachatty/model/Business.dart';
-import 'package:instachatty/ui/booking/bookingRequests.dart';
-import 'package:instachatty/model/BookingRequest.dart';
+import 'package:instachatty/services/Helper.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:easy_popup/easy_popup.dart';
 import 'package:instachatty/ui/post/home_post.dart';
-import 'package:instachatty/ui/signUp/BusinessTeamRegister.dart';
+import 'package:instachatty/ui/booking/booking.dart';
 import 'package:instachatty/model/InvoiceModel.dart';
-import 'package:instachatty/model/BookingModel.dart';
+import 'package:instachatty/ui/invoice/Invoice.dart';
 import 'package:instachatty/services/FirebaseHelper.dart';
-import 'package:instachatty/services/Helper.dart';
+import 'package:instachatty/model/BookingRequest.dart';
+import 'package:instachatty/ui/booking/bookingRequestCard.dart';
+import 'package:instachatty/model/notifications.dart';
+import 'package:instachatty/model/Business.dart';
 
 Color color1 = Color(COLOR_PRIMARY);
 Color color2 = Color(COLOR_PRIMARY_DARK);
 
+void isShowingNotificationNum() {
+  Notifications.notifications['count'] > 0
+      ? Notifications.notifications['visible'] = true
+      : Notifications.notifications['visible'] = false;
+}
+
+void notificationCounter() {
+  Notifications.notifications['count']++;
+}
+
+void resetNotifications() {
+  Notifications.notifications['count'] = 0;
+}
+
 class PartnerControlPanel extends StatefulWidget {
-  final Business business;
   final User user;
-  PartnerControlPanel({@required this.user, this.business});
+  final Business business;
+  PartnerControlPanel({@required this.user, @required this.business});
 
   @override
   _PartnerControlPanelState createState() =>
@@ -30,29 +44,36 @@ class PartnerControlPanel extends StatefulWidget {
 class _PartnerControlPanelState extends State<PartnerControlPanel> {
   final User user;
   final Business business;
-  final FireStoreUtils _fireStoreUtils = FireStoreUtils();
-
   _PartnerControlPanelState(this.user, this.business);
-  Stream<BookingRequest> bookingRequestStream;
+  final fireStoreUtils = FireStoreUtils();
+  Stream<List<BookingRequest>> _bookingRequestsStream;
+
   @override
   void initState() {
     super.initState();
+    setupStream();
   }
 
-  // setupStream() {
-  //   bookingRequestStream = _fireStoreUtils
-  //       .getChatMessages(homeConversationModel)
-  //       .asBroadcastStream();
-  //   bookingRequestStream.listen((chatModel) {
-  //     if (mounted) {
-  //       homeConversationModel.members = chatModel.members;
-  //       setState(() {});
-  //     }
-  //   });
-  // }
+  setupStream() {
+    _bookingRequestsStream = fireStoreUtils
+        .getBookingRequestsReceived(business.businessID)
+        .asBroadcastStream();
+    _bookingRequestsStream.listen((bookingRequestModel) {
+      if (mounted) {
+        setState(() {
+          isShowingNotificationNum();
+          notificationCounter();
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      Notifications.notifications['count'] = 0;
+      isShowingNotificationNum();
+    });
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
@@ -94,23 +115,6 @@ class _PartnerControlPanelState extends State<PartnerControlPanel> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  // IconButton(
-                  //   icon: Icon(
-                  //     Icons.add_circle,
-                  //     color: Colors.white,
-                  //   ),
-                  //   onPressed: () {
-                  //     Navigator.push(
-                  //         context,
-                  //         MaterialPageRoute(
-                  //           builder: (BuildContext context) =>
-                  //               BusinessTeamScreen(
-                  //             user: user,
-                  //             business: business,
-                  //           ),
-                  //         ));
-                  //   },
-                  // ),
                   IconButton(
                     icon: Icon(
                       Icons.arrow_back,
@@ -120,13 +124,37 @@ class _PartnerControlPanelState extends State<PartnerControlPanel> {
                       Navigator.pop(context);
                     },
                   ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.more_vert,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {},
-                  ),
+                  Stack(
+                    children: <Widget>[
+                      Icon(
+                        Icons.notifications_none,
+                        color: Colors.white,
+                      ),
+                      Visibility(
+                        visible: Notifications.notifications['visible'],
+                        child: Positioned(
+                          top: 0,
+                          right: 2,
+                          child: Container(
+                            height: 13,
+                            width: 13,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.red,
+                            ),
+                            child: Text(
+                              Notifications.notifications['count'].toString(),
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  )
                 ],
               ),
             )
@@ -145,7 +173,7 @@ class _PartnerControlPanelState extends State<PartnerControlPanel> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           displayCircleImage(business.businessLogoURL, 100.0, false),
-          SizedBox(height: 2),
+          SizedBox(height: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -154,8 +182,7 @@ class _PartnerControlPanelState extends State<PartnerControlPanel> {
                 style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 19,
-                    letterSpacing: 1.0),
+                    fontSize: 16),
               ),
             ],
           ),
@@ -281,80 +308,195 @@ class _PartnerControlPanelState extends State<PartnerControlPanel> {
       top: height * 0.30 + 34,
       child: Padding(
         padding: const EdgeInsets.only(right: 16, left: 16, top: 10),
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              Material(
-                elevation: 1,
-                color: Colors.white,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    buildBodyCardTitle(title: "Bookings"),
-                    Divider(
-                      height: 2,
-                      color: Colors.black87,
-                    ),
-                    Booking(
-                      invoice: InvoiceModel(
-                        invoiceId: "123wwww",
-                        customerName: "James",
-                        completed: false,
-                        customerUrl:
-                            'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2F25ac6600-f1c9-4b7f-ba70-7eb2750f6bef.png?alt=media&token=a006b3af-3269-4e16-a4e4-ad8279e94d42',
-                        sellerName: "Daniel",
-                        sellerUrl: user.profilePictureURL,
-                      ),
-                      appointmentTime: DateTime.now(),
-                    ),
-                    Booking(
-                      invoice: InvoiceModel(
-                        invoiceId: "123wwww",
-                        customerName: "Mark",
-                        completed: false,
-                        customerUrl:
-                            'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2Fc8befd09-542f-472d-a6d4-fb063c64962b.png?alt=media&token=d0b7d3be-641c-4fcf-b47a-e3450f5e75c4',
-                        sellerName: "Daniel",
-                        sellerUrl: user.profilePictureURL,
-                      ),
-                      appointmentTime: DateTime.now(),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 15),
-              Material(
-                elevation: 1,
-                color: Colors.white,
-                child: Column(
-                  children: <Widget>[
-                    buildBodyCardTitle(title: "Booking requests"),
-                    Divider(
-                      height: 3,
-                      color: Colors.black87,
-                    ),
-                    BookingRequestCard(
-                      bookingRequest: BookingRequest(
-                        customerName: "Jane Almond",
-                        customerUrl:
-                            'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2FOmEOdq5lNySXMHLmj146BGkOS4H2.png?alt=media&token=7c417a72-0b77-44b2-be9d-d086f3bb7d47',
-                      ),
-                    ),
-                    BookingRequestCard(
-                      bookingRequest: BookingRequest(
-                        customerName: "Nathan Green",
-                        customerUrl:
-                            'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2FnP9LsJtV0NZIhLpsgrPGjnw7N6l1.png?alt=media&token=7619b239-8682-4f84-bb55-b5b1c4d35300',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 50),
-            ],
-          ),
+        child: StreamBuilder(
+          stream: _bookingRequestsStream,
+          initialData: [BookingRequest()],
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              return ListView.builder(
+                itemCount: snapshot.data.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return BookingRequestCard(
+                    bookingRequest: snapshot.data[index],
+                  );
+                },
+              );
+            }
+          },
         ),
+        // SingleChildScrollView(
+        //   child: Column(
+        //     children: <Widget>[
+        //       Material(
+        //         elevation: 1,
+        //         color: Colors.white,
+        //         child: Column(
+        //           children: <Widget>[
+        //             buildBodyCardTitle(title: "Your Bookings"),
+        //             Divider(
+        //               height: 3,
+        //               color: Colors.black87,
+        //             ),
+        //             Booking(
+        //               invoice: InvoiceModel(
+        //                 customerName: user.fullName(),
+        //                 completed: false,
+        //                 customerUrl: user.profilePictureURL,
+        //                 invoiceId: 'fffa',
+        //                 status: PaymentStatus.paid,
+        //                 sellerName: 'Jane Doe',
+        //                 sellerId: 'qqqq',
+        //                 charge: 30.0,
+        //               ),
+        //               appointmentTime: DateTime.now(),
+        //             ),
+        //             Divider(
+        //               height: 3,
+        //               color: Colors.black87,
+        //             ),
+        //             Booking(
+        //               invoice: InvoiceModel(
+        //                 customerName: user.fullName(),
+        //                 sellerName: 'Dr. Melissa Avon',
+        //                 customerUrl: user.profilePictureURL,
+        //               ),
+        //               appointmentTime: DateTime.now(),
+        //             ),
+        //           ],
+        //         ),
+        //       ),
+        //       SizedBox(height: 15),
+        //       Material(
+        //         elevation: 1,
+        //         color: Colors.white,
+        //         child: Column(
+        //           mainAxisAlignment: MainAxisAlignment.end,
+        //           crossAxisAlignment: CrossAxisAlignment.center,
+        //           children: <Widget>[
+        //             buildBodyCardTitle(title: "Invoices"),
+        //             Divider(
+        //               height: 2,
+        //               color: Colors.black87,
+        //             ),
+        //             InvoiceCard(
+        //               details: InvoiceModel(
+        //                 customerId: "cccc",
+        //                 customerName: user.fullName(),
+        //                 customerUrl: user.profilePictureURL,
+        //                 charge: 100.00,
+        //                 completed: false,
+        //                 type: PaymentType.Electronic,
+        //                 sellerName: "Code Grease",
+        //                 sellerId: "gggg",
+        //                 status: PaymentStatus.paid,
+        //                 sellerUrl: user.profilePictureURL,
+        //               ),
+        //             )
+        //             // ListTile(
+        //             //   contentPadding: const EdgeInsets.only(
+        //             //     left: 10,
+        //             //     top: 10,
+        //             //     bottom: 10,
+        //             //   ),
+        //             //   leading: Card(
+        //             //     elevation: 2,
+        //             //     child: Container(
+        //             //       height: 70,
+        //             //       width: 60,
+        //             //       child: Column(
+        //             //         mainAxisAlignment: MainAxisAlignment.center,
+        //             //         children: <Widget>[
+        //             //           Text(
+        //             //             DateTime.now().month.toString(),
+        //             //             style: TextStyle(
+        //             //               fontWeight: FontWeight.bold,
+        //             //               fontSize: 14,
+        //             //             ),
+        //             //           ),
+        //             //           Text(
+        //             //             "21",
+        //             //             style: TextStyle(
+        //             //               fontWeight: FontWeight.bold,
+        //             //               fontSize: 18,
+        //             //             ),
+        //             //           ),
+        //             //         ],
+        //             //       ),
+        //             //     ),
+        //             //   ),
+        //             //   title: Column(
+        //             //     crossAxisAlignment: CrossAxisAlignment.start,
+        //             //     mainAxisAlignment: MainAxisAlignment.start,
+        //             //     children: <Widget>[
+        //             //       Text(
+        //             //         "Invoice 213",
+        //             //         style: TextStyle(fontWeight: FontWeight.bold),
+        //             //       ),
+        //             //       Text(
+        //             //         "This month fate fee",
+        //             //         style: TextStyle(
+        //             //           fontSize: 14,
+        //             //           color: Colors.grey,
+        //             //         ),
+        //             //       ),
+        //             //       Text(
+        //             //         "PENDING",
+        //             //         style: TextStyle(
+        //             //           color: Colors.red,
+        //             //           fontSize: 10,
+        //             //           fontWeight: FontWeight.bold,
+        //             //         ),
+        //             //       ),
+        //             //     ],
+        //             //   ),
+        //             //   trailing: Container(
+        //             //     height: 70,
+        //             //     width: 80,
+        //             //     padding: const EdgeInsets.only(right: 5),
+        //             //     child: Column(
+        //             //       mainAxisAlignment: MainAxisAlignment.center,
+        //             //       crossAxisAlignment: CrossAxisAlignment.center,
+        //             //       children: <Widget>[
+        //             //         Text(
+        //             //           "\$1200",
+        //             //           style: TextStyle(
+        //             //             fontWeight: FontWeight.bold,
+        //             //             fontSize: 18,
+        //             //           ),
+        //             //         ),
+        //             //         SizedBox(height: 2),
+        //             //         Container(
+        //             //           alignment: Alignment.center,
+        //             //           height: 30,
+        //             //           width: 80,
+        //             //           decoration: BoxDecoration(
+        //             //             borderRadius: BorderRadius.circular(20),
+        //             //             color: Color(0xff1abcaa),
+        //             //           ),
+        //             //           child: Text(
+        //             //             "PAY NOW",
+        //             //             style: TextStyle(
+        //             //               color: Colors.white,
+        //             //               fontSize: 12,
+        //             //               fontWeight: FontWeight.bold,
+        //             //             ),
+        //             //           ),
+        //             //         )
+        //             //       ],
+        //             //     ),
+        //             //   ),
+        //             // ),
+        //           ],
+        //         ),
+        //       ),
+        //       SizedBox(height: 50),
+        //     ],
+        //   ),
+        // ),
       ),
     );
   }
@@ -420,13 +562,6 @@ class _PartnerControlPanelState extends State<PartnerControlPanel> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Text(
-              "$views views $likes likes",
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
           ],
         ),
         trailing: Container(
@@ -459,29 +594,208 @@ class _PartnerControlPanelState extends State<PartnerControlPanel> {
             ),
           ),
         ),
-        onTap: () {},
+        onTap: () {
+          showModalBottomSheet(
+              elevation: 20.0,
+              context: context,
+              builder: (BuildContext context) {
+                return Container(
+                  height: 500.0,
+                  color: Color(COLOR_PRIMARY),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 10.0,
+                      ),
+                      Center(
+                        child: displayCircleImage(
+                            user.profilePictureURL, 105, false),
+                      ),
+                      Text(
+                        user.fullName(),
+                        style: TextStyle(
+                          fontSize: 19.0,
+                          color: Colors.white,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                      Divider(),
+                      Expanded(
+                        child: Container(
+                          width: double.infinity,
+                          color: Colors.white,
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: 20.0,
+                              ),
+                              Text(
+                                "Bookings",
+                                style: TextStyle(
+                                  fontSize: 19.0,
+                                  color: Color(COLOR_PRIMARY),
+                                ),
+                              ),
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Card(
+                                      child: Material(
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
+                                        color: Color(COLOR_PRIMARY),
+                                        child: SizedBox(
+                                          height: 100.0,
+                                          width: 160.0,
+                                          child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  "Tuesday",
+                                                  style: TextStyle(
+                                                    fontSize: 20.0,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "Regular Checkup",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      "Paid",
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                    IconButton(
+                                                      icon: Icon(
+                                                        LineIcons.money,
+                                                        color: Colors.white,
+                                                      ),
+                                                      onPressed: () {},
+                                                    ),
+                                                  ],
+                                                )
+                                              ]),
+                                        ),
+                                      ),
+                                    ),
+                                    Card(
+                                      child: Material(
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
+                                        color: Color(COLOR_PRIMARY),
+                                        child: SizedBox(
+                                          height: 100.0,
+                                          width: 160.0,
+                                          child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  "Wednesday",
+                                                  style: TextStyle(
+                                                    fontSize: 20.0,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "Consultation",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      "Paid",
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                    IconButton(
+                                                      icon: Icon(
+                                                        LineIcons.money,
+                                                        color: Colors.white,
+                                                      ),
+                                                      onPressed: () {},
+                                                    ),
+                                                  ],
+                                                )
+                                              ]),
+                                        ),
+                                      ),
+                                    ),
+                                    Card(
+                                      child: Material(
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
+                                        color: Color(COLOR_PRIMARY),
+                                        child: SizedBox(
+                                          height: 100.0,
+                                          width: 160.0,
+                                          child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  "Friday",
+                                                  style: TextStyle(
+                                                    fontSize: 20.0,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "Review",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      "Unpaid",
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ),
+                                                    IconButton(
+                                                      icon: Icon(
+                                                        LineIcons.money,
+                                                        color: Colors.white,
+                                                      ),
+                                                      onPressed: () {},
+                                                    ),
+                                                  ],
+                                                )
+                                              ]),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              });
+        },
       ),
     );
   }
 }
-
-// class BusinessBoarding extends StatefulWidget {
-//   @override
-//   State createState() {
-//     return BusinessBoardingState();
-//   }
-// }
-//
-// class BusinessBoardingState extends State<BusinessBoarding> {
-//   Future hasBusinessBoarding() async {}
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     // hasFinishedOnBoarding();
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold();
-//   }
-// }

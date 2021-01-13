@@ -725,6 +725,7 @@ class _SignUpState extends State<SignUpScreen> {
         lastOnlineTimestamp: Timestamp.now(),
         phoneNumber: _phoneNumber,
         isPartner: true,
+        partnerEnabled: false,
         settings: Settings(allowPushNotifications: true),
         userID: userID);
     user.isPartner = false;

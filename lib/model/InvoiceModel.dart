@@ -2,59 +2,62 @@ import 'package:instachatty/model/User.dart';
 import 'package:instachatty/model/Business.dart';
 
 class InvoiceModel {
-  String customerId = User().userID;
-  String customerName = User().fullName();
-  String customerUrl = User().profilePictureURL;
-  String sellerId = Business().businessID;
-  String sellerName = Business().businessName;
-  String sellerUrl = Business().businessLogoURL;
-  PaymentType type;
+  String customerID = '';
+  String customerName = '';
+  String customerURL = '';
+  String sellerID = '';
+  String sellerName = '';
+  String sellerURL = '';
+  String type = "";
   double charge = 0.00;
+  String additionalDetails = '';
   bool completed = false;
-  String invoiceId;
-  PaymentStatus status = PaymentStatus.unpaid;
+  String invoiceID;
+  bool status = false;
 
   InvoiceModel(
-      {this.customerId,
+      {this.customerID,
       this.customerName,
-      this.customerUrl,
-      this.sellerId,
+      this.customerURL,
+      this.sellerID,
       this.sellerName,
-      this.sellerUrl,
+      this.sellerURL,
       this.type,
       this.charge,
       this.completed,
-      this.invoiceId,
+      this.additionalDetails,
+      this.invoiceID,
       this.status});
 
   factory InvoiceModel.fromJson(Map<String, dynamic> parsedJson) {
     return new InvoiceModel(
-        customerId: User.fromJson(parsedJson).userID ?? User().userID,
-        customerName: User.fromJson(parsedJson).fullName() ?? User().fullName(),
-        customerUrl: User.fromJson(parsedJson).profilePictureURL ?? '',
-        sellerId:
-            Business.fromJson(parsedJson).businessID ?? Business().businessID,
-        sellerName: Business.fromJson(parsedJson).businessName ?? '',
-        sellerUrl: Business.fromJson(parsedJson).businessLogoURL ?? '',
-        type: parsedJson['type'] ?? PaymentType.Cash,
+        customerID: parsedJson['customerID'] ?? '',
+        customerName: parsedJson['customerName'] ?? "",
+        customerURL: parsedJson['customerURL'] ?? '',
+        sellerID: parsedJson['sellerID'] ?? '',
+        sellerName: parsedJson['sellerName'] ?? '',
+        sellerURL: parsedJson['sellerURL'] ?? '',
+        type: parsedJson['type'] ?? "Not mentioned",
         charge: parsedJson['charge'] ?? 0.00,
+        additionalDetails: parsedJson['additionalDetails'] ?? "Invoice",
         completed: parsedJson['completed'] ?? false,
-        invoiceId: parsedJson['paymentId'] ?? '',
-        status: parsedJson['status'] ?? PaymentStatus.unpaid);
+        invoiceID: parsedJson['paymentId'] ?? '',
+        status: parsedJson['status'] ?? false);
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'customerId': this.customerId,
+      'customerID': this.customerID,
       'customerName': this.customerName,
-      'customerUrl': this.customerUrl,
-      'seller': this.sellerId,
+      'customerURL': this.customerURL,
+      'seller': this.sellerID,
       'sellerName': this.sellerName,
-      'sellerUrl': this.sellerUrl,
+      'sellerURL': this.sellerURL,
       'type': this.type,
       'charge': this.charge,
+      'additionalDetails': this.additionalDetails,
       'completed': this.completed,
-      'paymentId': this.invoiceId,
+      'paymentID': this.invoiceID,
       'status': this.status,
     };
   }

@@ -77,10 +77,14 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
 
   double _locationSliderValue = 15;
   final ImagePicker _imagePicker = ImagePicker();
+  PickedFile image;
+  bool isLoadingPic = false;
+  bool doneLoadingPic = false;
   TextEditingController _messageController = TextEditingController();
   Uuid uuid = Uuid();
   String details = '';
   final User user;
+  String url = '';
   TextEditingController controller = new TextEditingController();
   final fireStoreUtils = FireStoreUtils();
   // bool doctorChipSelected = false,
@@ -106,7 +110,6 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
   @override
   void initState() {
     _future = fireStoreUtils.getBusinesses(user.userID, true);
-    print("initsss");
     super.initState();
   }
 
@@ -433,33 +436,186 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                               ),
                                                             ],
                                                           ),
-                                                          FlatButton(
-                                                              onPressed:
-                                                                  () async {
-                                                                _messageController
-                                                                            .text
-                                                                            .length >
-                                                                        0
-                                                                    ? _sendToServer(
-                                                                        business,
-                                                                        _messageController
-                                                                            .text,
-                                                                        service)
-                                                                    : print(
-                                                                        "make second thing");
-                                                                setState(() {
-                                                                  details = "";
-                                                                  _messageController
-                                                                      .text = '';
-                                                                });
-                                                              },
-                                                              child: Text(
-                                                                  'Submit',
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          18,
-                                                                      color: Color(
-                                                                          COLOR_PRIMARY)))),
+                                                          RaisedButton(
+                                                            color: Color(
+                                                                COLOR_PRIMARY),
+                                                            child: Text(
+                                                              "Select",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white),
+                                                            ),
+                                                            onPressed: () {
+                                                              showDialog(
+                                                                  context:
+                                                                      context,
+                                                                  builder:
+                                                                      (context) {
+                                                                    return Dialog(
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(40)),
+                                                                      elevation:
+                                                                          16,
+                                                                      child:
+                                                                          Container(
+                                                                        height:
+                                                                            200,
+                                                                        width:
+                                                                            350,
+                                                                        child:
+                                                                            Padding(
+                                                                          padding: const EdgeInsets.only(
+                                                                              top: 40.0,
+                                                                              left: 16,
+                                                                              right: 16,
+                                                                              bottom: 16),
+                                                                          child:
+                                                                              Column(
+                                                                            mainAxisSize:
+                                                                                MainAxisSize.max,
+                                                                            children: <Widget>[
+                                                                              Visibility(
+                                                                                visible: image.path.isNotEmpty && (!isLoadingPic || doneLoadingPic),
+                                                                                child: SizedBox(
+                                                                                  height: 100.0,
+                                                                                  child: !doneLoadingPic
+                                                                                      ? CircularProgressIndicator(
+                                                                                          valueColor: AlwaysStoppedAnimation<Color>(Color(COLOR_ACCENT)),
+                                                                                        )
+                                                                                      : SingleChildScrollView(
+                                                                                          child: Column(
+                                                                                            children: [
+                                                                                              Image.file(
+                                                                                                File(image.path),
+                                                                                                fit: BoxFit.cover,
+                                                                                              ),
+                                                                                            ],
+                                                                                          ),
+                                                                                        ),
+                                                                                ),
+                                                                              ),
+                                                                              Padding(
+                                                                                padding: const EdgeInsets.only(top: 8.0),
+                                                                                child: Row(
+                                                                                  children: <Widget>[
+                                                                                    IconButton(
+                                                                                      onPressed: () {
+                                                                                        _onCameraClick();
+                                                                                      },
+                                                                                      icon: Icon(
+                                                                                        Icons.camera_alt,
+                                                                                        color: Color(COLOR_PRIMARY),
+                                                                                      ),
+                                                                                    ),
+                                                                                    Expanded(
+                                                                                        child: Padding(
+                                                                                            padding: const EdgeInsets.only(left: 2.0, right: 2, top: 5.0),
+                                                                                            child: Container(
+                                                                                              padding: EdgeInsets.all(2),
+                                                                                              decoration: ShapeDecoration(
+                                                                                                shape: OutlineInputBorder(
+                                                                                                    borderRadius: BorderRadius.all(
+                                                                                                      Radius.circular(360),
+                                                                                                    ),
+                                                                                                    borderSide: BorderSide(style: BorderStyle.none)),
+                                                                                                color: isDarkMode(context) ? Colors.grey[700] : Colors.grey.shade200,
+                                                                                              ),
+                                                                                              child: Row(
+                                                                                                children: <Widget>[
+                                                                                                  // InkWell(
+                                                                                                  //   onTap: () => {},
+                                                                                                  //   child: Icon(
+                                                                                                  //     Icons.mic,
+                                                                                                  //     // color: currentRecordingState == RecordingState.HIDDEN ? Color(COLOR_PRIMARY) : Colors.red,
+                                                                                                  //   ),
+                                                                                                  // ),
+                                                                                                  Expanded(
+                                                                                                    child: TextField(
+                                                                                                      onChanged: (s) {
+                                                                                                        setState(() {});
+                                                                                                      },
+                                                                                                      onTap: () {
+                                                                                                        setState(() {
+                                                                                                          // currentRecordingState = RecordingState.HIDDEN;
+                                                                                                        });
+                                                                                                      },
+                                                                                                      textAlignVertical: TextAlignVertical.center,
+                                                                                                      controller: _messageController,
+                                                                                                      decoration: InputDecoration(
+                                                                                                        isDense: true,
+                                                                                                        contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                                                                                        hintText: 'Details',
+                                                                                                        hintStyle: TextStyle(color: Colors.grey[400]),
+                                                                                                        focusedBorder: OutlineInputBorder(
+                                                                                                            borderRadius: BorderRadius.all(
+                                                                                                              Radius.circular(360),
+                                                                                                            ),
+                                                                                                            borderSide: BorderSide(style: BorderStyle.none)),
+                                                                                                        enabledBorder: OutlineInputBorder(
+                                                                                                            borderRadius: BorderRadius.all(
+                                                                                                              Radius.circular(360),
+                                                                                                            ),
+                                                                                                            borderSide: BorderSide(style: BorderStyle.none)),
+                                                                                                      ),
+                                                                                                      textCapitalization: TextCapitalization.sentences,
+                                                                                                      maxLines: 5,
+                                                                                                      minLines: 1,
+                                                                                                      keyboardType: TextInputType.multiline,
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                ],
+                                                                                              ),
+                                                                                            ))),
+                                                                                    // IconButton(
+                                                                                    //     icon: Icon(
+                                                                                    //       Icons.send,
+                                                                                    //       color: _messageController.text.isEmpty ? Color(COLOR_PRIMARY).withOpacity(.5) : Color(COLOR_PRIMARY),
+                                                                                    //     ),
+                                                                                    //     onPressed: () async {
+                                                                                    //       if (_messageController.text.isNotEmpty) {
+                                                                                    //         // _sendMessage(_messageController.text, Url(mime: '', url: ''), '');
+                                                                                    //         _messageController.clear();
+                                                                                    //         setState(() {});
+                                                                                    //       }
+                                                                                    //     })
+                                                                                  ],
+                                                                                ),
+                                                                              ),
+                                                                              Spacer(),
+                                                                              Row(
+//                                          spacing: 30,
+                                                                                children: <Widget>[
+                                                                                  FlatButton(
+                                                                                      onPressed: () {
+                                                                                        Navigator.pop(context);
+                                                                                      },
+                                                                                      child: Text(
+                                                                                        'cancel',
+                                                                                        style: TextStyle(
+                                                                                          fontSize: 18,
+                                                                                        ),
+                                                                                      ).tr()),
+                                                                                  FlatButton(
+                                                                                      onPressed: () async {
+                                                                                        _messageController.text.length > 0 ? _sendToServer(business, _messageController.text, service, url) : print("make second thing");
+                                                                                        setState(() {
+                                                                                          details = "";
+                                                                                          url = "";
+                                                                                          _messageController.text = '';
+                                                                                        });
+                                                                                      },
+                                                                                      child: Text('Submit', style: TextStyle(fontSize: 18, color: Color(COLOR_PRIMARY)))),
+                                                                                ],
+                                                                              )
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                  });
+                                                            },
+                                                          ),
                                                         ],
                                                       ),
                                                     ),
@@ -708,135 +864,165 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                                     builder:
                                                                         (context) {
                                                                       return Dialog(
-                                                                          shape: RoundedRectangleBorder(
-                                                                              borderRadius: BorderRadius.circular(
-                                                                                  40)),
-                                                                          elevation:
-                                                                              16,
+                                                                        shape: RoundedRectangleBorder(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(40)),
+                                                                        elevation:
+                                                                            16,
+                                                                        child:
+                                                                            Container(
+                                                                          height: image != null
+                                                                              ? 305
+                                                                              : 200,
+                                                                          width:
+                                                                              350,
                                                                           child:
-                                                                              Container(
-                                                                            height:
-                                                                                200,
-                                                                            width:
-                                                                                350,
-                                                                            child: Padding(
-                                                                                padding: const EdgeInsets.only(top: 40.0, left: 16, right: 16, bottom: 16),
-                                                                                child: Column(
-                                                                                  mainAxisSize: MainAxisSize.max,
-                                                                                  children: <Widget>[
-                                                                                    Padding(
-                                                                                      padding: const EdgeInsets.only(top: 8.0),
-                                                                                      child: Row(
-                                                                                        children: <Widget>[
-                                                                                          IconButton(
-                                                                                            onPressed: () {},
-                                                                                            icon: Icon(
-                                                                                              Icons.camera_alt,
-                                                                                              color: Color(COLOR_PRIMARY),
-                                                                                            ),
-                                                                                          ),
-                                                                                          Expanded(
-                                                                                              child: Padding(
-                                                                                                  padding: const EdgeInsets.only(left: 2.0, right: 2, top: 5.0),
-                                                                                                  child: Container(
-                                                                                                    padding: EdgeInsets.all(2),
-                                                                                                    decoration: ShapeDecoration(
-                                                                                                      shape: OutlineInputBorder(
-                                                                                                          borderRadius: BorderRadius.all(
-                                                                                                            Radius.circular(360),
-                                                                                                          ),
-                                                                                                          borderSide: BorderSide(style: BorderStyle.none)),
-                                                                                                      color: isDarkMode(context) ? Colors.grey[700] : Colors.grey.shade200,
-                                                                                                    ),
-                                                                                                    child: Row(
-                                                                                                      children: <Widget>[
-                                                                                                        InkWell(
-                                                                                                          onTap: () => {},
-                                                                                                          child: Icon(
-                                                                                                            Icons.mic,
-                                                                                                            // color: currentRecordingState == RecordingState.HIDDEN ? Color(COLOR_PRIMARY) : Colors.red,
-                                                                                                          ),
-                                                                                                        ),
-                                                                                                        Expanded(
-                                                                                                          child: TextField(
-                                                                                                            onChanged: (s) {
-                                                                                                              setState(() {});
-                                                                                                            },
-                                                                                                            onTap: () {
-                                                                                                              setState(() {
-                                                                                                                // currentRecordingState = RecordingState.HIDDEN;
-                                                                                                              });
-                                                                                                            },
-                                                                                                            textAlignVertical: TextAlignVertical.center,
-                                                                                                            controller: _messageController,
-                                                                                                            decoration: InputDecoration(
-                                                                                                              isDense: true,
-                                                                                                              contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                                                                                                              hintText: 'Details',
-                                                                                                              hintStyle: TextStyle(color: Colors.grey[400]),
-                                                                                                              focusedBorder: OutlineInputBorder(
-                                                                                                                  borderRadius: BorderRadius.all(
-                                                                                                                    Radius.circular(360),
-                                                                                                                  ),
-                                                                                                                  borderSide: BorderSide(style: BorderStyle.none)),
-                                                                                                              enabledBorder: OutlineInputBorder(
-                                                                                                                  borderRadius: BorderRadius.all(
-                                                                                                                    Radius.circular(360),
-                                                                                                                  ),
-                                                                                                                  borderSide: BorderSide(style: BorderStyle.none)),
-                                                                                                            ),
-                                                                                                            textCapitalization: TextCapitalization.sentences,
-                                                                                                            maxLines: 5,
-                                                                                                            minLines: 1,
-                                                                                                            keyboardType: TextInputType.multiline,
-                                                                                                          ),
-                                                                                                        ),
-                                                                                                      ],
-                                                                                                    ),
-                                                                                                  ))),
-                                                                                          // IconButton(
-                                                                                          //     icon: Icon(
-                                                                                          //       Icons.send,
-                                                                                          //       color: _messageController.text.isEmpty ? Color(COLOR_PRIMARY).withOpacity(.5) : Color(COLOR_PRIMARY),
-                                                                                          //     ),
-                                                                                          //     onPressed: () async {
-                                                                                          //       if (_messageController.text.isNotEmpty) {
-                                                                                          //         // _sendMessage(_messageController.text, Url(mime: '', url: ''), '');
-                                                                                          //         _messageController.clear();
-                                                                                          //         setState(() {});
-                                                                                          //       }
-                                                                                          //     })
+                                                                              Padding(
+                                                                            padding: const EdgeInsets.only(
+                                                                                top: 40.0,
+                                                                                left: 16,
+                                                                                right: 16,
+                                                                                bottom: 16),
+                                                                            child:
+                                                                                Column(
+                                                                              mainAxisSize: MainAxisSize.max,
+                                                                              children: <Widget>[
+                                                                                Visibility(
+                                                                                  visible: image != null,
+                                                                                  child: SizedBox(
+                                                                                    height: 100.0,
+                                                                                    child: SingleChildScrollView(
+                                                                                      child: Column(
+                                                                                        children: [
+                                                                                          image != null
+                                                                                              ? Image.file(
+                                                                                                  File(image.path),
+                                                                                                  fit: BoxFit.cover,
+                                                                                                )
+                                                                                              : Container(),
                                                                                         ],
                                                                                       ),
                                                                                     ),
-                                                                                    Spacer(),
-                                                                                    Row(
+                                                                                  ),
+                                                                                ),
+                                                                                Padding(
+                                                                                  padding: const EdgeInsets.only(top: 8.0),
+                                                                                  child: Row(
+                                                                                    children: <Widget>[
+                                                                                      IconButton(
+                                                                                        onPressed: () {
+                                                                                          _onCameraClick();
+                                                                                        },
+                                                                                        icon: Icon(
+                                                                                          Icons.camera_alt,
+                                                                                          color: Color(COLOR_PRIMARY),
+                                                                                        ),
+                                                                                      ),
+                                                                                      Expanded(
+                                                                                          child: Padding(
+                                                                                              padding: const EdgeInsets.only(left: 2.0, right: 2, top: 5.0),
+                                                                                              child: Container(
+                                                                                                padding: EdgeInsets.all(2),
+                                                                                                decoration: ShapeDecoration(
+                                                                                                  shape: OutlineInputBorder(
+                                                                                                      borderRadius: BorderRadius.all(
+                                                                                                        Radius.circular(360),
+                                                                                                      ),
+                                                                                                      borderSide: BorderSide(style: BorderStyle.none)),
+                                                                                                  color: isDarkMode(context) ? Colors.grey[700] : Colors.grey.shade200,
+                                                                                                ),
+                                                                                                child: Row(
+                                                                                                  children: <Widget>[
+                                                                                                    InkWell(
+                                                                                                      onTap: () => {},
+                                                                                                      child: Icon(
+                                                                                                        Icons.mic,
+                                                                                                        // color: currentRecordingState == RecordingState.HIDDEN ? Color(COLOR_PRIMARY) : Colors.red,
+                                                                                                      ),
+                                                                                                    ),
+                                                                                                    Expanded(
+                                                                                                      child: TextField(
+                                                                                                        onChanged: (s) {
+                                                                                                          setState(() {});
+                                                                                                        },
+                                                                                                        onTap: () {
+                                                                                                          setState(() {
+                                                                                                            // currentRecordingState = RecordingState.HIDDEN;
+                                                                                                          });
+                                                                                                        },
+                                                                                                        textAlignVertical: TextAlignVertical.center,
+                                                                                                        controller: _messageController,
+                                                                                                        decoration: InputDecoration(
+                                                                                                          isDense: true,
+                                                                                                          contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                                                                                          hintText: 'Details',
+                                                                                                          hintStyle: TextStyle(color: Colors.grey[400]),
+                                                                                                          focusedBorder: OutlineInputBorder(
+                                                                                                              borderRadius: BorderRadius.all(
+                                                                                                                Radius.circular(360),
+                                                                                                              ),
+                                                                                                              borderSide: BorderSide(style: BorderStyle.none)),
+                                                                                                          enabledBorder: OutlineInputBorder(
+                                                                                                              borderRadius: BorderRadius.all(
+                                                                                                                Radius.circular(360),
+                                                                                                              ),
+                                                                                                              borderSide: BorderSide(style: BorderStyle.none)),
+                                                                                                        ),
+                                                                                                        textCapitalization: TextCapitalization.sentences,
+                                                                                                        maxLines: 5,
+                                                                                                        minLines: 1,
+                                                                                                        keyboardType: TextInputType.multiline,
+                                                                                                      ),
+                                                                                                    ),
+                                                                                                  ],
+                                                                                                ),
+                                                                                              ))),
+                                                                                      // IconButton(
+                                                                                      //     icon: Icon(
+                                                                                      //       Icons.send,
+                                                                                      //       color: _messageController.text.isEmpty ? Color(COLOR_PRIMARY).withOpacity(.5) : Color(COLOR_PRIMARY),
+                                                                                      //     ),
+                                                                                      //     onPressed: () async {
+                                                                                      //       if (_messageController.text.isNotEmpty) {
+                                                                                      //         // _sendMessage(_messageController.text, Url(mime: '', url: ''), '');
+                                                                                      //         _messageController.clear();
+                                                                                      //         setState(() {});
+                                                                                      //       }
+                                                                                      //     })
+                                                                                    ],
+                                                                                  ),
+                                                                                ),
+                                                                                Spacer(),
+                                                                                Row(
 //                                          spacing: 30,
-                                                                                      children: <Widget>[
-                                                                                        FlatButton(
-                                                                                            onPressed: () {
-                                                                                              Navigator.pop(context);
-                                                                                            },
-                                                                                            child: Text(
-                                                                                              'cancel',
-                                                                                              style: TextStyle(
-                                                                                                fontSize: 18,
-                                                                                              ),
-                                                                                            ).tr()),
-                                                                                        FlatButton(
-                                                                                            onPressed: () async {
-                                                                                              _messageController.text.length > 0 ? _sendToServer(business, _messageController.text, service) : print("make second thing");
-                                                                                              setState(() {
-                                                                                                details = "";
-                                                                                                _messageController.text = '';
-                                                                                              });
-                                                                                            },
-                                                                                            child: Text('Submit', style: TextStyle(fontSize: 18, color: Color(COLOR_PRIMARY)))),
-                                                                                      ],
-                                                                                    )
+                                                                                  children: <Widget>[
+                                                                                    FlatButton(
+                                                                                        onPressed: () {
+                                                                                          Navigator.pop(context);
+                                                                                        },
+                                                                                        child: Text(
+                                                                                          'cancel',
+                                                                                          style: TextStyle(
+                                                                                            fontSize: 18,
+                                                                                          ),
+                                                                                        ).tr()),
+                                                                                    FlatButton(
+                                                                                        onPressed: () async {
+                                                                                          _messageController.text.length > 0 ? _sendToServer(business, _messageController.text, service, url) : print("make second thing");
+                                                                                          setState(() {
+                                                                                            details = "";
+                                                                                            url = "";
+                                                                                            _messageController.text = '';
+                                                                                          });
+                                                                                        },
+                                                                                        child: Text('Submit', style: TextStyle(fontSize: 18, color: Color(COLOR_PRIMARY)))),
                                                                                   ],
-                                                                                )),
-                                                                          ));
+                                                                                )
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      );
                                                                     });
                                                               },
                                                             ),
@@ -1059,15 +1245,16 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
   //   }
   // }
 
-  _sendToServer(business, detail, serviceName) async {
+  _sendToServer(business, detail, serviceName, url) async {
     showProgress(context, 'Creating request', false);
     String requestID = uuid.v4();
     try {
       BookingRequest bookingRequest = BookingRequest(
         details: detail,
+        pictureDetailsURL: url,
         customerID: user.userID,
         customerName: user.fullName(),
-        customerUrl: user.profilePictureURL,
+        customerURL: user.profilePictureURL,
         sellerID: business.businessID,
         sellerName: business.businessName,
         handled: false,
@@ -1103,202 +1290,92 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
     }
   }
 
-// _onContactButtonClicked(
-  //     Business contact, int index, bool fromSearch) async {
-  //   switch (contact.type) {
-  //     case ContactType.ACCEPT:
-  //       showProgress(context, 'acceptingFriendship'.tr(), false);
-  //       await fireStoreUtils.onFriendAccept(contact.user);
-  //
-  //       if (fromSearch) {
-  //         _searchResult[index].type = ContactType.FRIEND;
-  //         _businesses
-  //             .where((user) => user.user.userID == contact.user.userID)
-  //             .first
-  //             .type = ContactType.FRIEND;
-  //       } else {
-  //         _businesses[index].type = ContactType.FRIEND;
-  //       }
-  //
-  //       break;
-  //     case ContactType.FRIEND:
-  //       showProgress(context, 'removingFriendship'.tr(), false);
-  //       await fireStoreUtils.onUnFriend(contact.user);
-  //       if (fromSearch) {
-  //         _searchResult[index].type = ContactType.UNKNOWN;
-  //         _businesses
-  //             .where((user) => user.user.userID == contact.user.userID)
-  //             .first
-  //             .type = ContactType.UNKNOWN;
-  //       } else {
-  //         _businesses[index].type = ContactType.UNKNOWN;
-  //       }
-  //       break;
-  //     case ContactType.PENDING:
-  //       showProgress(context, 'removingFriendshipRequest'.tr(), false);
-  //       await fireStoreUtils.onCancelRequest(contact.user);
-  //       if (fromSearch) {
-  //         _searchResult[index].type = ContactType.UNKNOWN;
-  //         _businesses
-  //             .where((user) => user.user.userID == contact.user.userID)
-  //             .first
-  //             .type = ContactType.UNKNOWN;
-  //       } else {
-  //         _businesses[index].type = ContactType.UNKNOWN;
-  //       }
-  //
-  //       break;
-  //     case ContactType.BLOCKED:
-  //       break;
-  //     case ContactType.UNKNOWN:
-  //       showProgress(context, 'sendingFriendshipRequest'.tr(), false);
-  //       await fireStoreUtils.sendFriendRequest(contact.user);
-  //       if (fromSearch) {
-  //         _searchResult[index].type = ContactType.PENDING;
-  //         _businesses
-  //             .where((user) => user.user.userID == contact.user.userID)
-  //             .first
-  //             .type = ContactType.PENDING;
-  //       }
-  //       break;
-  //   }
-  // }
-  // _onCameraClick() {
-  //   final action = CupertinoActionSheet(
-  //     message: Text(
-  //       "sendMedia",
-  //       style: TextStyle(fontSize: 15.0),
-  //     ).tr(),
-  //     actions: <Widget>[
-  //       CupertinoActionSheetAction(
-  //         child: Text("chooseImageFromGallery").tr(),
-  //         isDefaultAction: false,
-  //         onPressed: () async {
-  //           Navigator.pop(context);
-  //           PickedFile image =
-  //               await _imagePicker.getImage(source: ImageSource.gallery);
-  //           if (image != null) {
-  //             Url url = await fireStoreUtils.uploadChatImageToFireStorage(
-  //                 File(image.path), context);
-  //             _sendMessage('', url, '');
-  //           }
-  //         },
-  //       ),
-  //       CupertinoActionSheetAction(
-  //         child: Text("chooseVideoFromGallery").tr(),
-  //         isDefaultAction: false,
-  //         onPressed: () async {
-  //           Navigator.pop(context);
-  //           PickedFile galleryVideo =
-  //               await _imagePicker.getVideo(source: ImageSource.gallery);
-  //           if (galleryVideo != null) {
-  //             ChatVideoContainer videoContainer =
-  //                 await fireStoreUtils.uploadChatVideoToFireStorage(
-  //                     File(galleryVideo.path), context);
-  //             _sendMessage(
-  //                 '', videoContainer.videoUrl, videoContainer.thumbnailUrl);
-  //           }
-  //         },
-  //       ),
-  //       CupertinoActionSheetAction(
-  //         child: Text("takeAPicture").tr(),
-  //         isDestructiveAction: false,
-  //         onPressed: () async {
-  //           Navigator.pop(context);
-  //           PickedFile image =
-  //               await _imagePicker.getImage(source: ImageSource.camera);
-  //           if (image != null) {
-  //             Url url = await fireStoreUtils.uploadChatImageToFireStorage(
-  //                 File(image.path), context);
-  //             _sendMessage('', url, '');
-  //           }
-  //         },
-  //       ),
-  //       CupertinoActionSheetAction(
-  //         child: Text("recordVideo").tr(),
-  //         isDestructiveAction: false,
-  //         onPressed: () async {
-  //           Navigator.pop(context);
-  //           PickedFile recordedVideo =
-  //               await _imagePicker.getVideo(source: ImageSource.camera);
-  //           if (recordedVideo != null) {
-  //             ChatVideoContainer videoContainer =
-  //                 await fireStoreUtils.uploadChatVideoToFireStorage(
-  //                     File(recordedVideo.path), context);
-  //             _sendMessage(
-  //                 '', videoContainer.videoUrl, videoContainer.thumbnailUrl);
-  //           }
-  //         },
-  //       )
-  //     ],
-  //     cancelButton: CupertinoActionSheetAction(
-  //       child: Text(
-  //         "cancel",
-  //       ).tr(),
-  //       onPressed: () {
-  //         Navigator.pop(context);
-  //       },
-  //     ),
-  //   );
-  //   showCupertinoModalPopup(context: context, builder: (context) => action);
-  // }
-
-  // _sendMessage(String content, Url url, String videoThumbnail) async {
-  //   MessageData message;
-  //   if (homeConversationModel.isGroupChat) {
-  //     message = MessageData(
-  //         content: content,
-  //         created: Timestamp.now(),
-  //         senderFirstName: MyAppState.currentUser.firstName,
-  //         senderID: MyAppState.currentUser.userID,
-  //         senderLastName: MyAppState.currentUser.lastName,
-  //         senderProfilePictureURL: MyAppState.currentUser.profilePictureURL,
-  //         url: url,
-  //         videoThumbnail: videoThumbnail);
-  //   } else {
-  //     message = MessageData(
-  //         content: content,
-  //         created: Timestamp.now(),
-  //         recipientFirstName: homeConversationModel.members.first.firstName,
-  //         recipientID: homeConversationModel.members.first.userID,
-  //         recipientLastName: homeConversationModel.members.first.lastName,
-  //         recipientProfilePictureURL:
-  //             homeConversationModel.members.first.profilePictureURL,
-  //         senderFirstName: MyAppState.currentUser.firstName,
-  //         senderID: MyAppState.currentUser.userID,
-  //         senderLastName: MyAppState.currentUser.lastName,
-  //         senderProfilePictureURL: MyAppState.currentUser.profilePictureURL,
-  //         url: url,
-  //         videoThumbnail: videoThumbnail);
-  //   }
-  //   if (url != null) {
-  //     if (url.mime.contains('image')) {
-  //       message.content =
-  //           'sentAnImage'.tr(args: ['${MyAppState.currentUser.firstName}']);
-  //     } else if (url.mime.contains('video')) {
-  //       message.content =
-  //           'sentAVideo'.tr(args: ['${MyAppState.currentUser.firstName}']);
-  //     } else if (url.mime.contains('audio')) {
-  //       message.content = 'sentAVoiceMessage'
-  //           .tr(args: ['${MyAppState.currentUser.firstName}']);
-  //     }
-  //   }
-  //   if (await _checkChannelNullability(
-  //       homeConversationModel.conversationModel)) {
-  //     await fireStoreUtils.sendMessage(
-  //         homeConversationModel.members,
-  //         homeConversationModel.isGroupChat,
-  //         message,
-  //         homeConversationModel.conversationModel,
-  //         true);
-  //     homeConversationModel.conversationModel.lastMessageDate = Timestamp.now();
-  //     homeConversationModel.conversationModel.lastMessage = message.content;
-  //
-  //     await _fireStoreUtils
-  //         .updateChannel(homeConversationModel.conversationModel);
-  //   } else {
-  //     showAlertDialog(
-  //         context, 'anErrorOccurred'.tr(), 'failedToSendMessage'.tr());
-  //   }
-  // }
+  _onCameraClick() {
+    final action = CupertinoActionSheet(
+      message: Text(
+        "sendMedia",
+        style: TextStyle(fontSize: 15.0),
+      ).tr(),
+      actions: <Widget>[
+        CupertinoActionSheetAction(
+          child: Text("chooseImageFromGallery").tr(),
+          isDefaultAction: false,
+          onPressed: () async {
+            setState(() {
+              isLoadingPic = true;
+            });
+            Navigator.pop(context);
+            PickedFile imageGot =
+                await _imagePicker.getImage(source: ImageSource.gallery);
+            String detailURL = uuid.v4();
+            if (imageGot != null) {
+              url = await fireStoreUtils.uploadBusinessImageToFireStorage(
+                  File(imageGot.path), detailURL);
+              setState(() {
+                image = imageGot;
+                doneLoadingPic = true;
+                isLoadingPic = false;
+              });
+            }
+          },
+        ),
+        // CupertinoActionSheetAction(
+        //   child: Text("chooseVideoFromGallery").tr(),
+        //   isDefaultAction: false,
+        //   onPressed: () async {
+        //     Navigator.pop(context);
+        //     PickedFile galleryVideo =
+        //         await _imagePicker.getVideo(source: ImageSource.gallery);
+        //     if (galleryVideo != null) {
+        //       ChatVideoContainer videoContainer =
+        //           await fireStoreUtils.uploadChatVideoToFireStorage(
+        //               File(galleryVideo.path), context);
+        //       // _sendMessage(
+        //       //     '', videoContainer.videoUrl, videoContainer.thumbnailUrl);
+        //     }
+        //   },
+        // ),
+        CupertinoActionSheetAction(
+          child: Text("takeAPicture").tr(),
+          isDestructiveAction: false,
+          onPressed: () async {
+            Navigator.pop(context);
+            PickedFile image =
+                await _imagePicker.getImage(source: ImageSource.camera);
+            if (image != null) {
+              url = await fireStoreUtils.uploadBusinessImageToFireStorage(
+                  File(image.path), user.userID);
+              // _sendMessage('', url, '');
+            }
+          },
+        ),
+        // CupertinoActionSheetAction(
+        //   child: Text("recordVideo").tr(),
+        //   isDestructiveAction: false,
+        //   onPressed: () async {
+        //     Navigator.pop(context);
+        //     PickedFile recordedVideo =
+        //         await _imagePicker.getVideo(source: ImageSource.camera);
+        //     if (recordedVideo != null) {
+        //       ChatVideoContainer videoContainer =
+        //           await fireStoreUtils.uploadChatVideoToFireStorage(
+        //               File(recordedVideo.path), context);
+        //       _sendMessage(
+        //           '', videoContainer.videoUrl, videoContainer.thumbnailUrl);
+        //     }
+        //   },
+        // )
+      ],
+      cancelButton: CupertinoActionSheetAction(
+        child: Text(
+          "cancel",
+        ).tr(),
+        onPressed: () {
+          image = null;
+          Navigator.pop(context);
+        },
+      ),
+    );
+    showCupertinoModalPopup(context: context, builder: (context) => action);
+  }
 }

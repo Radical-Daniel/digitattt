@@ -10,8 +10,9 @@ import 'package:instachatty/model/InvoiceModel.dart';
 import 'package:instachatty/ui/invoice/Invoice.dart';
 import 'package:instachatty/services/FirebaseHelper.dart';
 import 'package:instachatty/model/BookingRequest.dart';
-import 'package:instachatty/ui/booking/bookingRequests.dart';
+import 'package:instachatty/ui/booking/bookingRequestCard.dart';
 import 'package:instachatty/model/notifications.dart';
+import 'package:instachatty/ui/booking/bookingRequestCardSender.dart';
 
 Color color1 = Color(COLOR_PRIMARY);
 Color color2 = Color(COLOR_PRIMARY_DARK);
@@ -325,7 +326,7 @@ class _CustomerControlPanelState extends State<CustomerControlPanel> {
               return ListView.builder(
                 itemCount: snapshot.data.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return BookingRequestCard(
+                  return BookingRequestCardSender(
                     bookingRequest: snapshot.data[index],
                   );
                 },

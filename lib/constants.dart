@@ -14,6 +14,7 @@ const FACEBOOK_BUTTON_COLOR = 0xFF415893;
 const USERS = 'users';
 const BUSINESSES = 'businesses';
 const PARTNERS = 'partners';
+const INVOICES = 'invoices';
 const SOCIAL_GRAPH = 'social_graph';
 const SENT_INVOICES = 'outbound_invoice';
 const RECEIVED_INVOICES = 'inbound_invoices';

@@ -81,7 +81,7 @@ class _BookingState extends State<Booking> {
                   ),
                   Column(
                     children: [
-                      displayCircleImage(invoice.customerUrl, 40.0, false),
+                      displayCircleImage(invoice.customerURL, 40.0, false),
                     ],
                   ),
                 ],

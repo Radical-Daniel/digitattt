@@ -58,7 +58,7 @@ class _InvoiceCardState extends State<InvoiceCard> {
                 ),
                 Column(
                   children: [
-                    displayCircleImage(details.sellerUrl, 40.0, false),
+                    displayCircleImage(details.sellerURL, 40.0, false),
                   ],
                 )
               ],

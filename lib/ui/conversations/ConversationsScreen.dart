@@ -125,13 +125,6 @@ class _ConversationsState extends State<ConversationsScreen> {
                             'noFriendsFound',
                             style: TextStyle(fontSize: 18),
                           ).tr(),
-                          IconButton(
-                            icon: Icon(
-                              Icons.add_circle,
-                              color: Colors.grey,
-                            ),
-                            onPressed: () {},
-                          )
                         ],
                       ),
                     );

@@ -125,34 +125,34 @@ class _RealEstateHomeState extends State<RealEstateHome> {
                 ),
                 SizedBox(height: 15),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Color(COLOR_PRIMARY),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            bottomLeft: Radius.circular(20),
-                            bottomRight: Radius.circular(20),
-                          ),
-                        ),
-                        child: TextField(
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            prefixIcon: Icon(
-                              Icons.search,
-                              color: Colors.white,
-                            ),
-                            hintText: 'Find your experience',
-                            hintStyle: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    // Expanded(
+                    //   child: Container(
+                    //     decoration: BoxDecoration(
+                    //       color: Color(COLOR_PRIMARY),
+                    //       borderRadius: BorderRadius.only(
+                    //         topLeft: Radius.circular(20),
+                    //         bottomLeft: Radius.circular(20),
+                    //         bottomRight: Radius.circular(20),
+                    //       ),
+                    //     ),
+                    //     child: TextField(
+                    //       decoration: InputDecoration(
+                    //         border: InputBorder.none,
+                    //         prefixIcon: Icon(
+                    //           Icons.search,
+                    //           color: Colors.white,
+                    //         ),
+                    //         hintText: 'Find your experience',
+                    //         hintStyle: TextStyle(
+                    //           color: Colors.white,
+                    //           fontWeight: FontWeight.bold,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                     Container(
                       width: 50,
                       alignment: Alignment.center,
@@ -232,42 +232,6 @@ class _RealEstateHomeState extends State<RealEstateHome> {
                                       ),
                                     );
                                   },
-                                ),
-                                Positioned(
-                                  top: 15,
-                                  left: 15,
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    height: 55,
-                                    width: 55,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        width: 2,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: <Widget>[
-                                        Text(
-                                          item.priceOff,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        Text(
-                                          'Off',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
                                 ),
                                 Positioned(
                                   bottom: 0,

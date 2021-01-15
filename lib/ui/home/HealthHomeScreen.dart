@@ -18,6 +18,8 @@ import 'package:instachatty/model/Business.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:instachatty/model/notifications.dart';
 import 'package:instachatty/ui/controlPanels/PartnerControlPanel.dart';
+import 'package:instachatty/ui/search/DoctorCardSearch.dart';
+import 'package:instachatty/ui/home/HomeScreen.dart';
 
 String img2 =
     "https://passivehouseplus.ie/media/k2/items/cache/fc5d9d8578a06f6d4c69c78df34d3f3a_XL.jpg?t=-62169984000";
@@ -191,7 +193,18 @@ class _HealthHomeState extends State<HealthHome>
                           color: Colors.white70,
                           child: SizedBox(
                             child: FlatButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          DoctorServicesSearchScreen(
+                                        user: user,
+                                        type: "doctor",
+                                      ),
+                                    ),
+                                  );
+                                },
                                 child: Image.asset("assets/images/doctor.png")),
                             height: 90.0,
                             width: 150.0,
@@ -201,7 +214,22 @@ class _HealthHomeState extends State<HealthHome>
                           margin: EdgeInsets.symmetric(horizontal: 10.0),
                           color: Colors.white70,
                           child: SizedBox(
-                            child: Image.asset("assets/images/pharmacist.png"),
+                            child: FlatButton(
+                              child:
+                                  Image.asset("assets/images/pharmacist.png"),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        DoctorServicesSearchScreen(
+                                      user: user,
+                                      type: "pharmacist",
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                             height: 90.0,
                             width: 150.0,
                           ),
@@ -218,7 +246,22 @@ class _HealthHomeState extends State<HealthHome>
                           margin: EdgeInsets.symmetric(horizontal: 10.0),
                           color: Colors.white70,
                           child: SizedBox(
-                            child: Image.asset("assets/images/radiologist.png"),
+                            child: FlatButton(
+                              child:
+                                  Image.asset("assets/images/radiologist.png"),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        DoctorServicesSearchScreen(
+                                      user: user,
+                                      type: "radiologist",
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                             height: 90.0,
                             width: 150.0,
                           ),
@@ -227,7 +270,22 @@ class _HealthHomeState extends State<HealthHome>
                           margin: EdgeInsets.symmetric(horizontal: 10.0),
                           color: Colors.white70,
                           child: SizedBox(
-                            child: Image.asset("assets/images/laboratory.png"),
+                            child: FlatButton(
+                              child:
+                                  Image.asset("assets/images/laboratory.png"),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        DoctorServicesSearchScreen(
+                                      user: user,
+                                      type: "laboratory",
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                             height: 90.0,
                             width: 150.0,
                           ),
@@ -277,7 +335,7 @@ class _HealthHomeState extends State<HealthHome>
                           Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text("We love stories about prohibition"),
+                              Text("We love stories about recovery"),
                               Row(
                                 verticalDirection: VerticalDirection.up,
                                 mainAxisAlignment:
@@ -315,6 +373,8 @@ class _HealthHomeState extends State<HealthHome>
   }
 
   Widget administrationScreenPicker() {
+    print(user.partnerEnabled);
+    print(user.isPartner);
     if (user.partnerEnabled) {
       return user.isPartner
           ? PartnerControlPanel(
@@ -363,7 +423,12 @@ class _HealthHomeState extends State<HealthHome>
                               user.partnerEnabled = true;
                               FireStoreUtils.updateUserState(user);
                               print("alrighty then");
-                              Navigator.pop(context);
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          HomeScreen(user: user)),
+                                  (route) => false);
                             },
                             child: Text('Confirm',
                                 style: TextStyle(

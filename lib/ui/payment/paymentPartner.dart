@@ -11,20 +11,19 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:instachatty/ui/components/dealPopUp.dart';
 import 'package:instachatty/ui/components/dealTile.dart';
-import 'package:intl/intl.dart';
 
-class AppointmentPartnerCard extends StatefulWidget {
-  AppointmentPartnerCard({@required this.deal, this.onPressed});
+class PaymentPartnerCard extends StatefulWidget {
+  PaymentPartnerCard({@required this.deal, this.onPressed});
   final Deal deal;
   final Function onPressed;
 
   @override
-  _AppointmentPartnerCardState createState() =>
-      _AppointmentPartnerCardState(deal, onPressed);
+  _PaymentPartnerCardState createState() =>
+      _PaymentPartnerCardState(deal, onPressed);
 }
 
-class _AppointmentPartnerCardState extends State<AppointmentPartnerCard> {
-  _AppointmentPartnerCardState(this.deal, this.onPressed);
+class _PaymentPartnerCardState extends State<PaymentPartnerCard> {
+  _PaymentPartnerCardState(this.deal, this.onPressed);
   final Deal deal;
   final Function onPressed;
   Uuid uuid = Uuid();
@@ -72,21 +71,27 @@ class _AppointmentPartnerCardState extends State<AppointmentPartnerCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Appointment with',
+                          'Payment submitted',
                           style: TextStyle(
                             color: Colors.white,
                           ),
                         ),
                         Text(
-                          '${deal.customerName}',
+                          'From ${deal.customerName}',
                           style: TextStyle(color: Colors.white),
                         ),
                         Text(
-                          deal.displayAppointmentTime,
+                          'To ${deal.sellerName}',
                           style: TextStyle(
                             color: Colors.white,
                           ),
                         ),
+                        deal.bookingConfirmed
+                            ? Text(deal.displayAppointmentTime)
+                            : Text(
+                                "Set Appointment Date",
+                                style: TextStyle(color: Colors.white),
+                              ),
                       ],
                     ),
                     onTap: () {
@@ -141,11 +146,8 @@ class _AppointmentPartnerCardState extends State<AppointmentPartnerCard> {
     showProgress(context, 'Sending Appointment details', false);
     deal.paid = true;
     deal.bookingConfirmed = true;
-    pickedDate.add(Duration(hours: time.hour, minutes: time.minute));
-    deal.appointmentDateTime =
-        DateFormat('yyyy-MM-dd – kk:mm').format(pickedDate);
     deal.displayAppointmentTime =
-        "${pickedDate.day}/${pickedDate.month}/${pickedDate.year} at ${time.hour}:${time.minute}";
+        "${pickedDate.year}, ${pickedDate.month}, ${pickedDate.day} ${time.hour}:${time.minute}";
     if (deal.customerInitiated) {
       try {
         await FireStoreUtils.updateCustomerCurrentSentDeal(deal);
@@ -270,7 +272,9 @@ class _AppointmentPartnerCardState extends State<AppointmentPartnerCard> {
           Column(
             children: [
               Text(
-                deal.displayAppointmentTime,
+                deal.bookingConfirmed
+                    ? deal.displayAppointmentTime
+                    : deal.customerAdditionalDetails,
                 style:
                     TextStyle(color: Colors.white, fontWeight: FontWeight.w300),
               ),
@@ -291,18 +295,20 @@ class _AppointmentPartnerCardState extends State<AppointmentPartnerCard> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        deal.bookingConfirmed
-                            ? Container()
-                            : RaisedButton(
-                                onPressed: _pickDate,
-                                child: Text("Set Date"),
-                              ),
-                        deal.bookingConfirmed
-                            ? Container()
-                            : RaisedButton(
-                                onPressed: _pickTime,
-                                child: Text("Set Time"),
-                              ),
+                        Visibility(
+                          visible: !deal.bookingConfirmed,
+                          child: RaisedButton(
+                            onPressed: _pickDate,
+                            child: Text("Set Date"),
+                          ),
+                        ),
+                        Visibility(
+                          visible: !deal.bookingConfirmed,
+                          child: RaisedButton(
+                            onPressed: _pickTime,
+                            child: Text("Set Time"),
+                          ),
+                        ),
                         RaisedButton(
                           onPressed: deal.bookingConfirmed
                               ? () {}
@@ -411,16 +417,13 @@ class _AppointmentPartnerCardState extends State<AppointmentPartnerCard> {
                                                           ).tr()),
                                                       FlatButton(
                                                           onPressed: () async {
-                                                            if (!deal
-                                                                .bookingConfirmed) {
-                                                              _sendToServer(
-                                                                  context);
-                                                              setState(() {
-                                                                url = "";
-                                                                _detailsController
-                                                                    .text = '';
-                                                              });
-                                                            }
+                                                            _sendToServer(
+                                                                context);
+                                                            setState(() {
+                                                              url = "";
+                                                              _detailsController
+                                                                  .text = '';
+                                                            });
                                                           },
                                                           child: Text('Submit',
                                                               style: TextStyle(
@@ -437,7 +440,7 @@ class _AppointmentPartnerCardState extends State<AppointmentPartnerCard> {
                                       });
                                 },
                           child: deal.bookingConfirmed
-                              ? Text("Appointment set")
+                              ? Text("Appointment Set")
                               : Text("Confirm Appointment"),
                         )
                       ],
@@ -456,22 +459,29 @@ class _AppointmentPartnerCardState extends State<AppointmentPartnerCard> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              "Date: ${pickedDate.year}, ${pickedDate.month}, ${pickedDate.day}",
+                              deal.bookingConfirmed
+                                  ? deal.displayAppointmentTime
+                                  : "Date: ${pickedDate.year}, ${pickedDate.month}, ${pickedDate.day}",
                               style: TextStyle(color: Colors.white),
                             ),
                             SizedBox(
                               width: 15.0,
                             ),
-                            Text(
-                              "Time: ${time.hour}:${time.minute}",
-                              style: TextStyle(color: Colors.white),
+                            Visibility(
+                              visible: !deal.bookingConfirmed,
+                              child: Text(
+                                "Time: ${time.hour}:${time.minute}",
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ),
                             SizedBox(
                               width: 15.0,
                             ),
                             Container(
                               child: Text(
-                                "Status",
+                                deal.bookingConfirmed
+                                    ? "Confirmed"
+                                    : "Uncomfirmed",
                                 style: TextStyle(color: Colors.white),
                               ),
                             )

@@ -16,6 +16,7 @@ import 'package:instachatty/services/FirebaseHelper.dart';
 import 'package:instachatty/services/Helper.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:instachatty/model/Business.dart';
 
 final _fireStoreUtils = FireStoreUtils();
 
@@ -251,100 +252,100 @@ class _LoginScreen extends State<LoginScreen> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Center(
-                child: Text(
-                  'or',
-                  style: TextStyle(
-                      color: isDarkMode(context) ? Colors.white : Colors.black),
-                ).tr(),
-              ),
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.only(right: 40.0, left: 40.0, bottom: 20),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minWidth: double.infinity),
-                child: RaisedButton.icon(
-                  label: Expanded(
-                    child: Text(
-                      'facebookLogin',
-                      textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ).tr(),
-                  ),
-                  icon: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Image.asset(
-                      'assets/images/facebook_logo.png',
-                      color: isDarkMode(context) ? Colors.black : Colors.white,
-                      height: 30,
-                      width: 30,
-                    ),
-                  ),
-                  color: Color(FACEBOOK_BUTTON_COLOR),
-                  textColor: isDarkMode(context) ? Colors.black : Colors.white,
-                  splashColor: Color(FACEBOOK_BUTTON_COLOR),
-                  onPressed: () async {
-                    final facebookLogin = FacebookLogin();
-                    final result = await facebookLogin.logIn(['email']);
-                    switch (result.status) {
-                      case FacebookLoginStatus.loggedIn:
-                        showProgress(
-                            context, 'loggingInPleaseWait'.tr(), false);
-                        await FirebaseAuth.instance
-                            .signInWithCredential(
-                                FacebookAuthProvider.getCredential(
-                                    accessToken: result.accessToken.token))
-                            .then((AuthResult authResult) async {
-                          User user = await _fireStoreUtils
-                              .getCurrentUser(authResult.user.uid);
-                          if (user == null) {
-                            _createUserFromFacebookLogin(
-                                result, authResult.user.uid);
-                          } else {
-                            _syncUserDataWithFacebookData(result, user);
-                          }
-                        });
-                        break;
-                      case FacebookLoginStatus.cancelledByUser:
-                        break;
-                      case FacebookLoginStatus.error:
-                        showAlertDialog(context, 'error'.tr(),
-                            'couldNotLoginWithFacebook'.tr());
-                        break;
-                    }
-                  },
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25.0),
-                      side: BorderSide(color: Color(FACEBOOK_BUTTON_COLOR))),
-                ),
-              ),
-            ),
-            InkWell(
-              onTap: () {
-                setState(() {
-                  signInWithPhoneNumber = !signInWithPhoneNumber;
-                });
-              },
-              child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Center(
-                  child: Text(
-                    signInWithPhoneNumber
-                        ? 'loginWithEmail'.tr()
-                        : 'loginWithPhoneNumber'.tr(),
-                    style: TextStyle(
-                        color: Colors.lightBlue,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                        letterSpacing: 1),
-                  ),
-                ),
-              ),
-            )
+            // Padding(
+            //   padding: const EdgeInsets.all(32.0),
+            //   child: Center(
+            //     child: Text(
+            //       'or',
+            //       style: TextStyle(
+            //           color: isDarkMode(context) ? Colors.white : Colors.black),
+            //     ).tr(),
+            //   ),
+            // ),
+            // Padding(
+            //   padding:
+            //       const EdgeInsets.only(right: 40.0, left: 40.0, bottom: 20),
+            //   child: ConstrainedBox(
+            //     constraints: const BoxConstraints(minWidth: double.infinity),
+            //     child: RaisedButton.icon(
+            //       label: Expanded(
+            //         child: Text(
+            //           'facebookLogin',
+            //           textAlign: TextAlign.center,
+            //           style:
+            //               TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            //         ).tr(),
+            //       ),
+            //       icon: Padding(
+            //         padding: const EdgeInsets.symmetric(vertical: 8.0),
+            //         child: Image.asset(
+            //           'assets/images/facebook_logo.png',
+            //           color: isDarkMode(context) ? Colors.black : Colors.white,
+            //           height: 30,
+            //           width: 30,
+            //         ),
+            //       ),
+            //       color: Color(FACEBOOK_BUTTON_COLOR),
+            //       textColor: isDarkMode(context) ? Colors.black : Colors.white,
+            //       splashColor: Color(FACEBOOK_BUTTON_COLOR),
+            //       onPressed: () async {
+            //         final facebookLogin = FacebookLogin();
+            //         final result = await facebookLogin.logIn(['email']);
+            //         switch (result.status) {
+            //           case FacebookLoginStatus.loggedIn:
+            //             showProgress(
+            //                 context, 'loggingInPleaseWait'.tr(), false);
+            //             await FirebaseAuth.instance
+            //                 .signInWithCredential(
+            //                     FacebookAuthProvider.getCredential(
+            //                         accessToken: result.accessToken.token))
+            //                 .then((AuthResult authResult) async {
+            //               User user = await _fireStoreUtils
+            //                   .getCurrentUser(authResult.user.uid);
+            //               if (user == null) {
+            //                 _createUserFromFacebookLogin(
+            //                     result, authResult.user.uid);
+            //               } else {
+            //                 _syncUserDataWithFacebookData(result, user);
+            //               }
+            //             });
+            //             break;
+            //           case FacebookLoginStatus.cancelledByUser:
+            //             break;
+            //           case FacebookLoginStatus.error:
+            //             showAlertDialog(context, 'error'.tr(),
+            //                 'couldNotLoginWithFacebook'.tr());
+            //             break;
+            //         }
+            //       },
+            //       shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(25.0),
+            //           side: BorderSide(color: Color(FACEBOOK_BUTTON_COLOR))),
+            //     ),
+            //   ),
+            // ),
+            // InkWell(
+            //   onTap: () {
+            //     setState(() {
+            //       signInWithPhoneNumber = !signInWithPhoneNumber;
+            //     });
+            //   },
+            //   child: Padding(
+            //     padding: EdgeInsets.all(8.0),
+            //     child: Center(
+            //       child: Text(
+            //         signInWithPhoneNumber
+            //             ? 'loginWithEmail'.tr()
+            //             : 'loginWithPhoneNumber'.tr(),
+            //         style: TextStyle(
+            //             color: Colors.lightBlue,
+            //             fontWeight: FontWeight.bold,
+            //             fontSize: 15,
+            //             letterSpacing: 1),
+            //       ),
+            //     ),
+            //   ),
+            // )
           ],
         ),
       ),
@@ -357,8 +358,21 @@ class _LoginScreen extends State<LoginScreen> {
       showProgress(context, 'loggingInPleaseWait'.tr(), false);
       User user =
           await loginWithUserNameAndPassword(email.trim(), password.trim());
-      if (user != null)
-        pushAndRemoveUntil(context, HomeScreen(user: user), false);
+      if (user != null) {
+        if (user.isPartner) {
+          Business business = await FireStoreUtils()
+              .getCurrentBusiness(user.businessAffiliations.last);
+          pushAndRemoveUntil(
+              context,
+              HomeScreen(
+                user: user,
+                business: business,
+              ),
+              false);
+        } else {
+          pushAndRemoveUntil(context, HomeScreen(user: user), false);
+        }
+      }
     } else {
       setState(() {
         _validate = AutovalidateMode.onUserInteraction;

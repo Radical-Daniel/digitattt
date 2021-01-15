@@ -11,20 +11,19 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:instachatty/ui/components/dealPopUp.dart';
 import 'package:instachatty/ui/components/dealTile.dart';
-import 'package:intl/intl.dart';
 
-class AppointmentPartnerCard extends StatefulWidget {
-  AppointmentPartnerCard({@required this.deal, this.onPressed});
+class AppointmentCustomerCard extends StatefulWidget {
+  AppointmentCustomerCard({@required this.deal, this.onPressed});
   final Deal deal;
   final Function onPressed;
 
   @override
-  _AppointmentPartnerCardState createState() =>
-      _AppointmentPartnerCardState(deal, onPressed);
+  _AppointmentCustomerCardState createState() =>
+      _AppointmentCustomerCardState(deal, onPressed);
 }
 
-class _AppointmentPartnerCardState extends State<AppointmentPartnerCard> {
-  _AppointmentPartnerCardState(this.deal, this.onPressed);
+class _AppointmentCustomerCardState extends State<AppointmentCustomerCard> {
+  _AppointmentCustomerCardState(this.deal, this.onPressed);
   final Deal deal;
   final Function onPressed;
   Uuid uuid = Uuid();
@@ -141,11 +140,8 @@ class _AppointmentPartnerCardState extends State<AppointmentPartnerCard> {
     showProgress(context, 'Sending Appointment details', false);
     deal.paid = true;
     deal.bookingConfirmed = true;
-    pickedDate.add(Duration(hours: time.hour, minutes: time.minute));
-    deal.appointmentDateTime =
-        DateFormat('yyyy-MM-dd – kk:mm').format(pickedDate);
     deal.displayAppointmentTime =
-        "${pickedDate.day}/${pickedDate.month}/${pickedDate.year} at ${time.hour}:${time.minute}";
+        "${pickedDate.year}, ${pickedDate.month}, ${pickedDate.day} ${time.hour}:${time.minute}";
     if (deal.customerInitiated) {
       try {
         await FireStoreUtils.updateCustomerCurrentSentDeal(deal);
@@ -255,7 +251,7 @@ class _AppointmentPartnerCardState extends State<AppointmentPartnerCard> {
             ),
           ),
           Text(
-            deal.customerName,
+            deal.sellerName,
             style: TextStyle(
               fontSize: 19.0,
               color: Colors.white,
@@ -265,7 +261,7 @@ class _AppointmentPartnerCardState extends State<AppointmentPartnerCard> {
 
           // Divider(),
           Center(
-            child: displayCircleImage(deal.customerURL, 75, false),
+            child: displayCircleImage(deal.sellerURL, 75, false),
           ),
           Column(
             children: [
@@ -291,18 +287,18 @@ class _AppointmentPartnerCardState extends State<AppointmentPartnerCard> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        deal.bookingConfirmed
-                            ? Container()
-                            : RaisedButton(
-                                onPressed: _pickDate,
-                                child: Text("Set Date"),
-                              ),
-                        deal.bookingConfirmed
-                            ? Container()
-                            : RaisedButton(
-                                onPressed: _pickTime,
-                                child: Text("Set Time"),
-                              ),
+                        // deal.bookingConfirmed
+                        //     ? Container()
+                        //     : RaisedButton(
+                        //         onPressed: _pickDate,
+                        //         child: Text("Set Date"),
+                        //       ),
+                        // deal.bookingConfirmed
+                        //     ? Container()
+                        //     : RaisedButton(
+                        //         onPressed: _pickTime,
+                        //         child: Text("Set Time"),
+                        //       ),
                         RaisedButton(
                           onPressed: deal.bookingConfirmed
                               ? () {}
@@ -384,8 +380,7 @@ class _AppointmentPartnerCardState extends State<AppointmentPartnerCard> {
                                                                               style: BorderStyle.none)),
                                                             ),
                                                             child: Text(
-                                                                "Are you certain you wish to appoint this time? \n"
-                                                                "${pickedDate.year}, ${pickedDate.month}, ${pickedDate.day} at ${time.hour}:${time.minute}hrs",
+                                                                "Confirm availability",
                                                                 style: TextStyle(
                                                                     fontSize:
                                                                         17.0)),

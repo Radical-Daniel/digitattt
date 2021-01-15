@@ -7,12 +7,15 @@ import 'package:easy_popup/easy_popup.dart';
 import 'package:instachatty/ui/post/home_post.dart';
 import 'package:instachatty/ui/booking/booking.dart';
 import 'package:instachatty/model/InvoiceModel.dart';
-import 'package:instachatty/ui/invoice/Invoice.dart';
+import 'package:instachatty/ui/invoice/InvoiceCustomerCard.dart';
 import 'package:instachatty/services/FirebaseHelper.dart';
 import 'package:instachatty/model/BookingRequest.dart';
 import 'package:instachatty/ui/booking/bookingRequestCard.dart';
 import 'package:instachatty/model/notifications.dart';
 import 'package:instachatty/ui/booking/bookingRequestCardSender.dart';
+import 'package:instachatty/model/Deal.dart';
+import 'package:instachatty/ui/payment/PaidCustomer.dart';
+import 'package:instachatty/ui/booking/AppointmentCustomerCard.dart';
 
 Color color1 = Color(COLOR_PRIMARY);
 Color color2 = Color(COLOR_PRIMARY_DARK);
@@ -43,7 +46,7 @@ class _CustomerControlPanelState extends State<CustomerControlPanel> {
   final User user;
   _CustomerControlPanelState(this.user);
   final fireStoreUtils = FireStoreUtils();
-  Stream<List<BookingRequest>> _bookingRequestsStream;
+  Stream<List<Deal>> _dealRequestsStream;
 
   @override
   void initState() {
@@ -52,9 +55,9 @@ class _CustomerControlPanelState extends State<CustomerControlPanel> {
   }
 
   setupStream() {
-    _bookingRequestsStream =
-        fireStoreUtils.getBookingRequestsSent(user.userID).asBroadcastStream();
-    _bookingRequestsStream.listen((bookingRequestModel) {
+    _dealRequestsStream =
+        fireStoreUtils.getDealRequestsSent(user.userID).asBroadcastStream();
+    _dealRequestsStream.listen((dealRequestModel) {
       if (mounted) {
         setState(() {
           isShowingNotificationNum();
@@ -310,13 +313,13 @@ class _CustomerControlPanelState extends State<CustomerControlPanel> {
   Widget buildNotificationPanel(double width, double height) {
     return Positioned(
       width: width,
-      height: height * .70 - 40,
+      height: height * .60 - 40,
       top: height * 0.30 + 34,
       child: Padding(
         padding: const EdgeInsets.only(right: 16, left: 16, top: 10),
         child: StreamBuilder(
-          stream: _bookingRequestsStream,
-          initialData: [BookingRequest()],
+          stream: _dealRequestsStream,
+          initialData: [],
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
@@ -326,9 +329,24 @@ class _CustomerControlPanelState extends State<CustomerControlPanel> {
               return ListView.builder(
                 itemCount: snapshot.data.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return BookingRequestCardSender(
-                    bookingRequest: snapshot.data[index],
-                  );
+                  if (snapshot.hasData) {
+                    // if(snapshot.data[index].)
+                    if (snapshot.data[index].bookingConfirmed) {
+                      return AppointmentCustomerCard(
+                        deal: snapshot.data[index],
+                      );
+                    }
+                    return snapshot.data[index].enquiryHandled
+                        ? InvoiceCard(
+                            deal: snapshot.data[index],
+                          )
+                        : BookingRequestCardSender(
+                            deal: snapshot.data[index],
+                          );
+                  } else
+                    return Container(
+                      child: Text("No requests yet"),
+                    );
                 },
               );
             }
@@ -523,284 +541,6 @@ class _CustomerControlPanelState extends State<CustomerControlPanel> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget buildNotificationItem(
-      {IconData icon,
-      String postType,
-      String description,
-      int views,
-      int likes}) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 10),
-      child: ListTile(
-        contentPadding: const EdgeInsets.only(left: 10),
-        leading: Container(
-          height: 60,
-          width: 60,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [color1, color2],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: Icon(
-            icon,
-            size: 28,
-            color: Colors.white70,
-          ),
-        ),
-        title: Text(
-          postType,
-          style: TextStyle(color: Colors.grey, fontSize: 13),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              description,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        trailing: Container(
-          height: 40,
-          width: 70,
-          decoration: BoxDecoration(
-            border: Border(
-              left: BorderSide(
-                width: 1,
-                color: Colors.black26,
-              ),
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(left: 5),
-            child: Row(
-              children: <Widget>[
-                Icon(
-                  Icons.timer,
-                  color: Colors.grey,
-                  size: 15,
-                ),
-                Text(
-                  " 1 Day",
-                  style: TextStyle(
-                    color: Colors.grey,
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-        onTap: () {
-          showModalBottomSheet(
-              elevation: 20.0,
-              context: context,
-              builder: (BuildContext context) {
-                return Container(
-                  height: 500.0,
-                  color: Color(COLOR_PRIMARY),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                      Center(
-                        child: displayCircleImage(
-                            user.profilePictureURL, 105, false),
-                      ),
-                      Text(
-                        user.fullName(),
-                        style: TextStyle(
-                          fontSize: 19.0,
-                          color: Colors.white,
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                      Divider(),
-                      Expanded(
-                        child: Container(
-                          width: double.infinity,
-                          color: Colors.white,
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height: 20.0,
-                              ),
-                              Text(
-                                "Bookings",
-                                style: TextStyle(
-                                  fontSize: 19.0,
-                                  color: Color(COLOR_PRIMARY),
-                                ),
-                              ),
-                              SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Card(
-                                      child: Material(
-                                        borderRadius:
-                                            BorderRadius.circular(5.0),
-                                        color: Color(COLOR_PRIMARY),
-                                        child: SizedBox(
-                                          height: 100.0,
-                                          width: 160.0,
-                                          child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  "Tuesday",
-                                                  style: TextStyle(
-                                                    fontSize: 20.0,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  "Regular Checkup",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Text(
-                                                      "Paid",
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    ),
-                                                    IconButton(
-                                                      icon: Icon(
-                                                        LineIcons.money,
-                                                        color: Colors.white,
-                                                      ),
-                                                      onPressed: () {},
-                                                    ),
-                                                  ],
-                                                )
-                                              ]),
-                                        ),
-                                      ),
-                                    ),
-                                    Card(
-                                      child: Material(
-                                        borderRadius:
-                                            BorderRadius.circular(5.0),
-                                        color: Color(COLOR_PRIMARY),
-                                        child: SizedBox(
-                                          height: 100.0,
-                                          width: 160.0,
-                                          child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  "Wednesday",
-                                                  style: TextStyle(
-                                                    fontSize: 20.0,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  "Consultation",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Text(
-                                                      "Paid",
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    ),
-                                                    IconButton(
-                                                      icon: Icon(
-                                                        LineIcons.money,
-                                                        color: Colors.white,
-                                                      ),
-                                                      onPressed: () {},
-                                                    ),
-                                                  ],
-                                                )
-                                              ]),
-                                        ),
-                                      ),
-                                    ),
-                                    Card(
-                                      child: Material(
-                                        borderRadius:
-                                            BorderRadius.circular(5.0),
-                                        color: Color(COLOR_PRIMARY),
-                                        child: SizedBox(
-                                          height: 100.0,
-                                          width: 160.0,
-                                          child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  "Friday",
-                                                  style: TextStyle(
-                                                    fontSize: 20.0,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  "Review",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Text(
-                                                      "Unpaid",
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    ),
-                                                    IconButton(
-                                                      icon: Icon(
-                                                        LineIcons.money,
-                                                        color: Colors.white,
-                                                      ),
-                                                      onPressed: () {},
-                                                    ),
-                                                  ],
-                                                )
-                                              ]),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              });
-        },
       ),
     );
   }

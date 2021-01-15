@@ -11,20 +11,19 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:instachatty/ui/components/dealPopUp.dart';
 import 'package:instachatty/ui/components/dealTile.dart';
-import 'package:intl/intl.dart';
 
-class AppointmentPartnerCard extends StatefulWidget {
-  AppointmentPartnerCard({@required this.deal, this.onPressed});
+class PaymentCustomerCard extends StatefulWidget {
+  PaymentCustomerCard({@required this.deal, this.onPressed});
   final Deal deal;
   final Function onPressed;
 
   @override
-  _AppointmentPartnerCardState createState() =>
-      _AppointmentPartnerCardState(deal, onPressed);
+  _PaymentCustomerCardState createState() =>
+      _PaymentCustomerCardState(deal, onPressed);
 }
 
-class _AppointmentPartnerCardState extends State<AppointmentPartnerCard> {
-  _AppointmentPartnerCardState(this.deal, this.onPressed);
+class _PaymentCustomerCardState extends State<PaymentCustomerCard> {
+  _PaymentCustomerCardState(this.deal, this.onPressed);
   final Deal deal;
   final Function onPressed;
   Uuid uuid = Uuid();
@@ -65,28 +64,31 @@ class _AppointmentPartnerCardState extends State<AppointmentPartnerCard> {
                     leading: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        displayCircleImage(deal.customerURL, 40.0, false),
+                        displayCircleImage(deal.sellerURL, 40.0, false),
                       ],
                     ),
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Appointment with',
+                          'Payment Submitted to',
                           style: TextStyle(
                             color: Colors.white,
                           ),
                         ),
                         Text(
-                          '${deal.customerName}',
+                          '${deal.sellerName}',
                           style: TextStyle(color: Colors.white),
                         ),
-                        Text(
-                          deal.displayAppointmentTime,
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
+                        // Text(
+                        //   deal.appointmentTime
+                        //       .split(", ")
+                        //       .sublist(0, 3)
+                        //       .join(" "),
+                        //   style: TextStyle(
+                        //     color: Colors.white,
+                        //   ),
+                        // ),
                       ],
                     ),
                     onTap: () {
@@ -141,11 +143,8 @@ class _AppointmentPartnerCardState extends State<AppointmentPartnerCard> {
     showProgress(context, 'Sending Appointment details', false);
     deal.paid = true;
     deal.bookingConfirmed = true;
-    pickedDate.add(Duration(hours: time.hour, minutes: time.minute));
-    deal.appointmentDateTime =
-        DateFormat('yyyy-MM-dd – kk:mm').format(pickedDate);
     deal.displayAppointmentTime =
-        "${pickedDate.day}/${pickedDate.month}/${pickedDate.year} at ${time.hour}:${time.minute}";
+        "${pickedDate.year}, ${pickedDate.month}, ${pickedDate.day} ${time.hour}:${time.minute}";
     if (deal.customerInitiated) {
       try {
         await FireStoreUtils.updateCustomerCurrentSentDeal(deal);

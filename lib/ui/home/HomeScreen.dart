@@ -11,6 +11,8 @@ import 'package:instachatty/ui/home/HealthHomeScreen.dart';
 import 'package:instachatty/services/Helper.dart';
 import 'package:instachatty/ui/search/ServicesSearchScreen.dart';
 import 'package:instachatty/model/Business.dart';
+import 'package:instachatty/ui/chatTemplate/multipick.dart';
+import 'package:instachatty/ui/chatTemplate/photofilter.dart';
 
 class HomeScreen extends StatefulWidget {
   final User user;
@@ -41,9 +43,10 @@ class _HomeScreenState extends State<HomeScreen> {
       ServicesSearchScreen(
         user: user,
       ),
-      ProfileScreen(
-        user: user,
-      ),
+      Philter(),
+      // ProfileScreen(
+      //   user: user,
+      // ),
     ];
     return Scaffold(
       bottomNavigationBar: CurvedNavigationBar(

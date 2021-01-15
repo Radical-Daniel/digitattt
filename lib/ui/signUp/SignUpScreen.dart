@@ -608,6 +608,7 @@ class _SignUpState extends State<SignUpScreen> {
             lastName: lastName,
             interestMap: interest,
             isPartner: isPartner,
+            partnerEnabled: false,
             businessAffiliations: [''],
             settings: Settings(allowPushNotifications: true),
             profilePictureURL: profilePicUrl);
@@ -728,6 +729,7 @@ class _SignUpState extends State<SignUpScreen> {
         partnerEnabled: false,
         settings: Settings(allowPushNotifications: true),
         userID: userID);
+    user.partnerEnabled = false;
     user.isPartner = false;
     await FireStoreUtils.firestore
         .collection(USERS)

@@ -23,11 +23,6 @@ import 'package:instachatty/ui/controlPanels/CustomerControlPanel.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:instachatty/model/notifications.dart';
 import 'package:instachatty/model/Deal.dart';
-import 'package:instachatty/model/ImageDetailModel.dart';
-import 'package:image_editor_pro/image_editor_pro.dart';
-import 'package:flutter_luban/flutter_luban.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
 
 List<Business> _searchResult = [];
 Map<String, dynamic> _filterList = {
@@ -69,18 +64,23 @@ class BuildContactInfo extends ChangeNotifier {
   }
 }
 
-class ServicesSearchScreen extends StatefulWidget {
+class DoctorServicesSearchScreen extends StatefulWidget {
+  final String type;
   final User user;
 
-  const ServicesSearchScreen({Key key, @required this.user}) : super(key: key);
+  const DoctorServicesSearchScreen(
+      {Key key, @required this.user, @required this.type})
+      : super(key: key);
 
   @override
-  _ServicesSearchScreenState createState() => _ServicesSearchScreenState(user);
+  _DoctorServicesSearchScreenState createState() =>
+      _DoctorServicesSearchScreenState(user, type);
 }
 
-class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
+class _DoctorServicesSearchScreenState
+    extends State<DoctorServicesSearchScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
+  final String type;
   double _locationSliderValue = 15;
   final ImagePicker _imagePicker = ImagePicker();
   PickedFile image;
@@ -89,7 +89,6 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
   TextEditingController _messageController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   Uuid uuid = Uuid();
-  String requestID;
   String details = '';
   final User user;
   String url = '';
@@ -110,25 +109,16 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
   //     wellnessChipSelected = false,
   //     studentChipSelected = false,
   //     educationChipSelected = false;
-  _ServicesSearchScreenState(this.user);
-  Stream<List<ImageDetails>> _imageDetailStream;
+  _DoctorServicesSearchScreenState(this.user, this.type);
+
   Future<List<Business>> _future;
   User selectedContact;
-  File imageFile;
+
   @override
   void initState() {
     _future = fireStoreUtils.getBusinesses(user.userID, true);
     super.initState();
-    requestID = uuid.v4();
-
-    setupStream();
   }
-
-  void setupStream() {
-    _imageDetailStream = fireStoreUtils.getDealDetailImagesSent(requestID);
-  }
-
-  File _image;
 
   @override
   Widget build(BuildContext context) {
@@ -137,38 +127,7 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
       value: selectedContact,
       child: Scaffold(
         key: _scaffoldKey,
-        drawer: CustomerControlPanel(user: user),
         appBar: AppBar(
-          leading: Stack(
-            children: [
-              IconButton(
-                icon: Icon(LineIcons.bell),
-                onPressed: () {
-                  _scaffoldKey.currentState.openDrawer();
-                },
-              ),
-              Positioned(
-                top: 13,
-                right: 24,
-                child: Container(
-                  height: 13,
-                  width: 13,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.red,
-                  ),
-                  child: Text(
-                    Notifications.notifications['count'].toString(),
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              )
-            ],
-          ),
           centerTitle: true,
           backgroundColor: Color(COLOR_PRIMARY),
           title: Text(
@@ -203,7 +162,7 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                           Radius.circular(360),
                         ),
                         borderSide: BorderSide(style: BorderStyle.none)),
-                    hintText: 'Search for services',
+                    hintText: 'Search for a $type',
                     suffixIcon: IconButton(
                       iconSize: 20,
                       icon: Icon(Icons.close),
@@ -255,89 +214,6 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                 ),
               ),
             ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              // child: Row(
-              //   children: [
-              //     Padding(
-              //         padding: const EdgeInsets.all(4.0),
-              //         child: FilterChip(
-              //           selected: _filterList['doctor'],
-              //           selectedColor: Color(COLOR_PRIMARY),
-              //           onSelected: (bool value) {
-              //             setState(() {
-              //               _filterList['doctor'] = value;
-              //             });
-              //             _onSearchFilterChanged(controller.text);
-              //           },
-              //           label: Text(
-              //             "DOCTOR",
-              //             style: TextStyle(
-              //                 color: _filterList['doctor']
-              //                     ? Colors.white
-              //                     : Colors.black),
-              //           ),
-              //         )),
-              //     Padding(
-              //         padding: const EdgeInsets.all(4.0),
-              //         child: FilterChip(
-              //           selected: _filterList['pharmacist'],
-              //           selectedColor: Color(COLOR_PRIMARY),
-              //           onSelected: (value) {
-              //             setState(() {
-              //               _filterList['pharmacist'] = value;
-              //               _onSearchFilterChanged(controller.text);
-              //             });
-              //           },
-              //           label: Text(
-              //             "PHARMACIST",
-              //             style: TextStyle(
-              //                 color: _filterList['pharmacist']
-              //                     ? Colors.white
-              //                     : Colors.black),
-              //           ),
-              //         )),
-              //     Padding(
-              //         padding: const EdgeInsets.all(4.0),
-              //         child: FilterChip(
-              //           selected: _filterList['laboratory'],
-              //           selectedColor: Color(COLOR_PRIMARY),
-              //           onSelected: (bool value) {
-              //             setState(() {
-              //               _filterList['laboratory'] = value;
-              //               _onSearchFilterChanged(controller.text);
-              //             });
-              //           },
-              //           label: Text(
-              //             "LABORATORY",
-              //             style: TextStyle(
-              //                 color: _filterList['laboratory']
-              //                     ? Colors.white
-              //                     : Colors.black),
-              //           ),
-              //         )),
-              //     Padding(
-              //         padding: const EdgeInsets.all(4.0),
-              //         child: FilterChip(
-              //           selected: _filterList['radiologist'],
-              //           selectedColor: Color(COLOR_PRIMARY),
-              //           onSelected: (bool value) {
-              //             setState(() {
-              //               _filterList['radiologist'] = value;
-              //             });
-              //             _onSearchFilterChanged(controller.text);
-              //           },
-              //           label: Text(
-              //             "RADIOLOGIST",
-              //             style: TextStyle(
-              //                 color: _filterList['radiologist']
-              //                     ? Colors.white
-              //                     : Colors.black),
-              //           ),
-              //         )),
-              //   ],
-              // ),
-            ),
             FutureBuilder<List<Business>>(
               future: _future,
               initialData: [],
@@ -357,7 +233,7 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                   return Expanded(
                     child: Center(
                       child: Text(
-                        'No Business Found',
+                        'No ${type}s found',
                         style: TextStyle(fontSize: 18),
                       ),
                     ),
@@ -493,7 +369,7 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                                                 MainAxisSize.max,
                                                                             children: <Widget>[
                                                                               Visibility(
-                                                                                visible: isLoadingPic,
+                                                                                visible: image.path.isNotEmpty && (!isLoadingPic || doneLoadingPic),
                                                                                 child: SizedBox(
                                                                                   height: 100.0,
                                                                                   child: !doneLoadingPic
@@ -584,18 +460,65 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                                                                 ],
                                                                                               ),
                                                                                             ))),
-                                                                                    // IconButton(
-                                                                                    //     icon: Icon(
-                                                                                    //       Icons.send,
-                                                                                    //       color: _messageController.text.isEmpty ? Color(COLOR_PRIMARY).withOpacity(.5) : Color(COLOR_PRIMARY),
-                                                                                    //     ),
-                                                                                    //     onPressed: () async {
-                                                                                    //       if (_messageController.text.isNotEmpty) {
-                                                                                    //         // _sendMessage(_messageController.text, Url(mime: '', url: ''), '');
-                                                                                    //         _messageController.clear();
-                                                                                    //         setState(() {});
-                                                                                    //       }
-                                                                                    //     })
+                                                                                  ],
+                                                                                ),
+                                                                              ),
+                                                                              Padding(
+                                                                                padding: const EdgeInsets.only(top: 8.0),
+                                                                                child: Row(
+                                                                                  children: <Widget>[
+                                                                                    Expanded(
+                                                                                        child: Padding(
+                                                                                            padding: const EdgeInsets.only(left: 2.0, right: 2, top: 5.0),
+                                                                                            child: Container(
+                                                                                              padding: EdgeInsets.all(2),
+                                                                                              decoration: ShapeDecoration(
+                                                                                                shape: OutlineInputBorder(
+                                                                                                    borderRadius: BorderRadius.all(
+                                                                                                      Radius.circular(360),
+                                                                                                    ),
+                                                                                                    borderSide: BorderSide(style: BorderStyle.none)),
+                                                                                                color: isDarkMode(context) ? Colors.grey[700] : Colors.grey.shade200,
+                                                                                              ),
+                                                                                              child: Row(
+                                                                                                children: <Widget>[
+                                                                                                  Expanded(
+                                                                                                    child: TextField(
+                                                                                                      onChanged: (s) {
+                                                                                                        setState(() {});
+                                                                                                      },
+                                                                                                      onTap: () {
+                                                                                                        setState(() {
+                                                                                                          // currentRecordingState = RecordingState.HIDDEN;
+                                                                                                        });
+                                                                                                      },
+                                                                                                      textAlignVertical: TextAlignVertical.center,
+                                                                                                      controller: _addressController,
+                                                                                                      decoration: InputDecoration(
+                                                                                                        isDense: true,
+                                                                                                        contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                                                                                        hintText: 'Delivery Address',
+                                                                                                        hintStyle: TextStyle(color: Colors.grey[400]),
+                                                                                                        focusedBorder: OutlineInputBorder(
+                                                                                                            borderRadius: BorderRadius.all(
+                                                                                                              Radius.circular(360),
+                                                                                                            ),
+                                                                                                            borderSide: BorderSide(style: BorderStyle.none)),
+                                                                                                        enabledBorder: OutlineInputBorder(
+                                                                                                            borderRadius: BorderRadius.all(
+                                                                                                              Radius.circular(360),
+                                                                                                            ),
+                                                                                                            borderSide: BorderSide(style: BorderStyle.none)),
+                                                                                                      ),
+                                                                                                      textCapitalization: TextCapitalization.sentences,
+                                                                                                      maxLines: 5,
+                                                                                                      minLines: 1,
+                                                                                                      keyboardType: TextInputType.multiline,
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                ],
+                                                                                              ),
+                                                                                            ))),
                                                                                   ],
                                                                                 ),
                                                                               ),
@@ -950,13 +873,13 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                                                                 ),
                                                                                                 child: Row(
                                                                                                   children: <Widget>[
-                                                                                                    // InkWell(
-                                                                                                    //   onTap: () => {},
-                                                                                                    //   child: Icon(
-                                                                                                    //     Icons.mic,
-                                                                                                    //     // color: currentRecordingState == RecordingState.HIDDEN ? Color(COLOR_PRIMARY) : Colors.red,
-                                                                                                    //   ),
-                                                                                                    // ),
+                                                                                                    InkWell(
+                                                                                                      onTap: () => {},
+                                                                                                      child: Icon(
+                                                                                                        Icons.mic,
+                                                                                                        // color: currentRecordingState == RecordingState.HIDDEN ? Color(COLOR_PRIMARY) : Colors.red,
+                                                                                                      ),
+                                                                                                    ),
                                                                                                     Expanded(
                                                                                                       child: TextField(
                                                                                                         onChanged: (s) {
@@ -1200,24 +1123,6 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
     );
   }
 
-  // Future<void> getimageditor() {
-  //   final geteditimage =
-  //       Navigator.push(context, MaterialPageRoute(builder: (context) {
-  //     return ImageEditorPro(
-  //       appBarColor: Colors.blue,
-  //       bottomBarColor: Colors.blue,
-  //     );
-  //   })).then((geteditimage) {
-  //     if (geteditimage != null) {
-  //       setState(() {
-  //         _image = geteditimage;
-  //       });
-  //     }
-  //   }).catchError((er) {
-  //     print(er);
-  //   });
-  // }
-
   _onSearchFilterChanged(String searchedText) async {
     _searchResult.clear();
     List<String> selectedFilters =
@@ -1285,7 +1190,20 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
   _sendToServer(Business business, detail, customerDeliveryDetails, serviceName,
       url) async {
     showProgress(context, 'Creating request', false);
+    String requestID = uuid.v4();
     try {
+      // BookingRequest bookingRequest = BookingRequest(
+      //   details: detail,
+      //   pictureDetailsURL: url,
+      //   customerID: user.userID,
+      //   customerName: user.fullName(),
+      //   customerURL: user.profilePictureURL,
+      //   sellerID: business.businessID,
+      //   sellerName: business.businessName,
+      //   handled: false,
+      //   serviceName: serviceName,
+      //   requestID: requestID,
+      // );
       Deal deal = Deal(
         customerID: user.userID,
         customerName: user.fullName(),
@@ -1295,7 +1213,7 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
         sellerURL: business.businessLogoURL,
         customerInitiated: true,
         serviceName: serviceName,
-        pictureDetailsURL: url,
+        pictureDetailsURL: "",
         requestID: requestID,
         customerAdditionalDetails: detail,
         customerDeliveryDetails: customerDeliveryDetails,
@@ -1362,33 +1280,17 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
               isLoadingPic = true;
             });
             Navigator.pop(context);
-            File imageGot =
-                await ImagePicker.pickImage(source: ImageSource.gallery);
+            PickedFile imageGot =
+                await _imagePicker.getImage(source: ImageSource.gallery);
             String detailURL = uuid.v4();
             if (imageGot != null) {
-              final tempDir = await getTemporaryDirectory();
-              showProgress(context, 'loading image', false);
-              CompressObject compressObject = CompressObject(
-                imageFile: File(imageGot.path), //image
-                path: tempDir.path, //compress to path
-                quality: 85, //first compress quality, default 80
-                step:
-                    2, //compress quality step, The bigger the fast, Smaller is more accurate, default 6
-                mode: CompressMode.LARGE2SMALL, //default AUTO
-              );
-              await Luban.compressImage(compressObject).then((imageComp) {
-                setState(() {
-                  imageFile = File(imageComp);
-                  print(imageComp);
-                  print("look aboveeeee");
-                });
-              });
               url = await fireStoreUtils.uploadBusinessImageToFireStorage(
-                  imageFile, detailURL);
+                  File(imageGot.path), detailURL);
               setState(() {
+                image = imageGot;
                 doneLoadingPic = true;
+                isLoadingPic = false;
               });
-              hideProgress();
             }
           },
         ),

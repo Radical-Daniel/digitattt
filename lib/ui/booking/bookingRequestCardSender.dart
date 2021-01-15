@@ -2,19 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:instachatty/constants.dart';
 import 'package:instachatty/services/Helper.dart';
 import 'package:instachatty/model/BookingRequest.dart';
+import 'package:instachatty/model/Deal.dart';
 
 class BookingRequestCardSender extends StatefulWidget {
-  BookingRequestCardSender({@required this.bookingRequest, this.onPressed});
-  final BookingRequest bookingRequest;
+  BookingRequestCardSender({@required this.deal, this.onPressed});
+  final Deal deal;
   final Function onPressed;
   @override
   _BookingRequestCardSenderState createState() =>
-      _BookingRequestCardSenderState(bookingRequest, onPressed);
+      _BookingRequestCardSenderState(deal, onPressed);
 }
 
 class _BookingRequestCardSenderState extends State<BookingRequestCardSender> {
-  _BookingRequestCardSenderState(this.bookingRequest, this.onPressed);
-  final BookingRequest bookingRequest;
+  _BookingRequestCardSenderState(this.deal, this.onPressed);
+  final Deal deal;
   final Function onPressed;
   @override
   Widget build(BuildContext context) {
@@ -24,43 +25,38 @@ class _BookingRequestCardSenderState extends State<BookingRequestCardSender> {
         child: FlatButton(
           onPressed: onPressed,
           child: SizedBox(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ListTile(
-                leading: bookingRequest.sellerURL.length > 1
-                    ? Column(
-                        children: [
-                          Row(
-                            children: [
-                              displayCircleImage(
-                                  bookingRequest.sellerURL, 40.0, false),
-                            ],
-                          ),
-                        ],
-                      )
-                    : null,
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Column(
+            child: ListTile(
+              leading: deal.sellerURL.length > 1
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          'Booking request to',
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          '${bookingRequest.sellerName}',
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(bookingRequest.details),
+                        displayCircleImage(deal.sellerURL, 40.0, false),
                       ],
-                    ),
-                  ],
-                ),
+                    )
+                  : Container(),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Booking request to',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        '${deal.sellerName}',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(deal.customerAdditionalDetails),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),

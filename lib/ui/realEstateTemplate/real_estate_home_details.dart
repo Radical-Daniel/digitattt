@@ -79,14 +79,6 @@ class RealEstateDetails extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Text(
-                          "\$4,999",
-                          style: TextStyle(
-                            color: Color(0xff632bbf),
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
                         Icon(
                           Icons.bookmark_border,
                           size: 30,
@@ -121,7 +113,6 @@ class RealEstateDetails extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Text('1,200 sq.ft')
                       ],
                     ),
                     SizedBox(height: 15),
@@ -144,67 +135,6 @@ class RealEstateDetails extends StatelessWidget {
                           //     fontSize: 20,
                           //   ),
                           // ),
-                          ListTile(
-                            contentPadding: const EdgeInsets.all(0),
-                            title: Text(
-                              "\$1,602/month",
-                              style: TextStyle(
-                                fontSize: 18,
-                              ),
-                            ),
-                            subtitle: Text(
-                              "Estimated repayment",
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 12,
-                              ),
-                            ),
-                            trailing: Container(
-                              alignment: Alignment.center,
-                              width: 80,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Container(
-                                    width: 10,
-                                    height: 8,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFFfed19a),
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(20),
-                                        bottomLeft: Radius.circular(20),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 25,
-                                    height: 25,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Color(0xFF632bbf),
-                                    ),
-                                    child: Icon(
-                                      Icons.question_answer,
-                                      color: Colors.white,
-                                      size: 15,
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 10,
-                                    height: 8,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFFfed19a),
-                                      borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(20),
-                                        bottomRight: Radius.circular(20),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          )
                         ],
                       ),
                     ),
@@ -216,26 +146,29 @@ class RealEstateDetails extends StatelessWidget {
                           SizedBox(
                             width: 10.0,
                           ),
-                          displayCircleImage(
-                              'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2FnP9LsJtV0NZIhLpsgrPGjnw7N6l1.png?alt=media&token=7619b239-8682-4f84-bb55-b5b1c4d35300',
-                              70.0,
-                              false),
+                          Column(
+                            children: [
+                              displayCircleImage(
+                                  'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2FnP9LsJtV0NZIhLpsgrPGjnw7N6l1.png?alt=media&token=7619b239-8682-4f84-bb55-b5b1c4d35300',
+                                  70.0,
+                                  false),
+                              Text("Michael Alec"),
+                            ],
+                          ),
                           SizedBox(
                             width: 10.0,
                           ),
-                          displayCircleImage(
-                              'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2Fc8befd09-542f-472d-a6d4-fb063c64962b.png?alt=media&token=d0b7d3be-641c-4fcf-b47a-e3450f5e75c4',
-                              70.0,
-                              false),
                           SizedBox(
                             width: 10.0,
                           ),
-                          displayCircleImage(
-                              'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2FlKPkdgcrBCNr8azqb1c9WH56mQi1.png?alt=media&token=bfdbd43e-1964-4279-b80c-fc907c37fc9d',
-                              70.0,
-                              false),
-                          SizedBox(
-                            width: 10.0,
+                          Column(
+                            children: [
+                              displayCircleImage(
+                                  'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2FlKPkdgcrBCNr8azqb1c9WH56mQi1.png?alt=media&token=bfdbd43e-1964-4279-b80c-fc907c37fc9d',
+                                  70.0,
+                                  false),
+                              Text("Niel Walker"),
+                            ],
                           ),
                           Column(
                             children: [
@@ -249,17 +182,27 @@ class RealEstateDetails extends StatelessWidget {
                           SizedBox(
                             width: 10.0,
                           ),
-                          displayCircleImage(
-                              'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2Fc8befd09-542f-472d-a6d4-fb063c64962b.png?alt=media&token=d0b7d3be-641c-4fcf-b47a-e3450f5e75c4',
-                              70.0,
-                              false),
+                          Column(
+                            children: [
+                              displayCircleImage(
+                                  'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2Fc8befd09-542f-472d-a6d4-fb063c64962b.png?alt=media&token=d0b7d3be-641c-4fcf-b47a-e3450f5e75c4',
+                                  70.0,
+                                  false),
+                              Text("Michael Alec"),
+                            ],
+                          ),
                           SizedBox(
                             width: 10.0,
                           ),
-                          displayCircleImage(
-                              'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2FlKPkdgcrBCNr8azqb1c9WH56mQi1.png?alt=media&token=bfdbd43e-1964-4279-b80c-fc907c37fc9d',
-                              70.0,
-                              false),
+                          Column(
+                            children: [
+                              displayCircleImage(
+                                  'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2FlKPkdgcrBCNr8azqb1c9WH56mQi1.png?alt=media&token=bfdbd43e-1964-4279-b80c-fc907c37fc9d',
+                                  70.0,
+                                  false),
+                              Text("Niel Walker"),
+                            ],
+                          ),
                         ],
                       ),
                     ),

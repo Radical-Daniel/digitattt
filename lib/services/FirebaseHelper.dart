@@ -25,6 +25,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:instachatty/model/BookingRequest.dart';
+import 'package:instachatty/model/Deal.dart';
+import 'package:instachatty/model/ImageDetailModel.dart';
 
 class FireStoreUtils {
   static FirebaseMessaging firebaseMessaging = FirebaseMessaging();
@@ -37,10 +39,12 @@ class FireStoreUtils {
   List<User> receivedRequests = [];
   List<ContactModel> contactsList = [];
   StreamController<List<HomeConversationModel>> conversationsStream;
-  StreamController<List<BookingRequest>> sentBookingReviewsStream;
-  StreamController<List<BookingRequest>> receivedBookingReviewsStream;
-  List<BookingRequest> sentBookingReviews = [];
-  List<BookingRequest> receivedBookingReviews = [];
+  StreamController<List<ImageDetails>> imageDetailStream;
+  StreamController<List<Deal>> sentDealStream;
+  StreamController<List<Deal>> receivedDealStream;
+  List<Deal> sentDeals = [];
+  List<ImageDetails> imageDetails = [];
+  List<Deal> receivedDeals = [];
   List<HomeConversationModel> homeConversations = [];
   List<BlockUserModel> blockedList = [];
 
@@ -69,7 +73,6 @@ class FireStoreUtils {
   static void updateUserState(user) async {
     await FireStoreUtils.updateCurrentUser(user);
     MyAppState.currentUser = user;
-    hideProgress();
   }
 
   static Future<User> updateCurrentUser(User user) async {
@@ -79,6 +82,54 @@ class FireStoreUtils {
         .setData(user.toJson())
         .then((document) {
       return user;
+    });
+  }
+
+  static Future<Deal> updateCustomerCurrentSentDeal(Deal deal) async {
+    return await firestore
+        .collection(DEALS)
+        .document(deal.customerID)
+        .collection(SENT_DEALS)
+        .document(deal.requestID)
+        .setData(deal.toJson())
+        .then((document) {
+      return deal;
+    });
+  }
+
+  static Future<Deal> updateCustomerCurrentReceivedDeal(Deal deal) async {
+    return await firestore
+        .collection(DEALS)
+        .document(deal.customerID)
+        .collection(RECEIVED_DEALS)
+        .document(deal.requestID)
+        .setData(deal.toJson())
+        .then((document) {
+      return deal;
+    });
+  }
+
+  static Future<Deal> updateSellerCurrentSentDeal(Deal deal) async {
+    return await firestore
+        .collection(DEALS)
+        .document(deal.sellerID)
+        .collection(SENT_DEALS)
+        .document(deal.requestID)
+        .setData(deal.toJson())
+        .then((document) {
+      return deal;
+    });
+  }
+
+  static Future<Deal> updateSellerCurrentReceivedDeal(Deal deal) async {
+    return await firestore
+        .collection(DEALS)
+        .document(deal.sellerID)
+        .collection(RECEIVED_DEALS)
+        .document(deal.requestID)
+        .setData(deal.toJson())
+        .then((document) {
+      return deal;
     });
   }
 
@@ -554,63 +605,88 @@ class FireStoreUtils {
     yield* conversationsStream.stream;
   }
 
-  Stream<List<BookingRequest>> getBookingRequestsSent(String userID) async* {
-    sentBookingReviewsStream = StreamController<List<BookingRequest>>();
+  Stream<List<ImageDetails>> getDealDetailImagesSent(String requestID) async* {
+    imageDetailStream = StreamController<List<ImageDetails>>();
     firestore
-        .collection(BOOKING_REQUESTS)
-        .document(userID)
-        .collection(SENT_BOOKING_REQUESTS)
+        .collection(DETAILS)
+        .document(requestID)
+        .collection(DETAILS_IMAGES)
         .snapshots()
         .listen((querySnapshot) {
       print(querySnapshot.documents.first.data);
       if (querySnapshot.documents.isEmpty) {
-        sentBookingReviewsStream.sink.add(sentBookingReviews);
+        imageDetailStream.sink.add(imageDetails);
       } else {
-        if (sentBookingReviews.isNotEmpty) {
-          sentBookingReviews.clear();
+        if (imageDetails.isNotEmpty) {
+          imageDetails.clear();
         }
         Future.forEach(querySnapshot.documents, (DocumentSnapshot document) {
           if (document != null && document.exists) {
-            BookingRequest bookingRequest =
-                BookingRequest.fromJson(document.data);
-            sentBookingReviews.add(bookingRequest);
-            sentBookingReviewsStream.sink.add(sentBookingReviews);
+            ImageDetails imageDetail = ImageDetails.fromJson(document.data);
+            imageDetails.add(imageDetail);
+            imageDetailStream.sink.add(imageDetails);
           }
         });
       }
     });
 
-    yield* sentBookingReviewsStream.stream;
+    yield* imageDetailStream.stream;
   }
 
-  Stream<List<BookingRequest>> getBookingRequestsReceived(
-      String userID) async* {
-    receivedBookingReviewsStream = StreamController<List<BookingRequest>>();
+  Stream<List<Deal>> getDealRequestsSent(String userID) async* {
+    sentDealStream = StreamController<List<Deal>>();
     firestore
-        .collection(BOOKING_REQUESTS)
+        .collection(DEALS)
         .document(userID)
-        .collection(RECEIVED_BOOKING_REQUESTS)
+        .collection(SENT_DEALS)
         .snapshots()
         .listen((querySnapshot) {
       print(querySnapshot.documents.first.data);
       if (querySnapshot.documents.isEmpty) {
-        receivedBookingReviewsStream.sink.add(receivedBookingReviews);
+        sentDealStream.sink.add(sentDeals);
       } else {
-        if (receivedBookingReviews.isNotEmpty) {
-          receivedBookingReviews.clear();
+        if (sentDeals.isNotEmpty) {
+          sentDeals.clear();
         }
         Future.forEach(querySnapshot.documents, (DocumentSnapshot document) {
           if (document != null && document.exists) {
-            BookingRequest bookingRequest =
-                BookingRequest.fromJson(document.data);
-            receivedBookingReviews.add(bookingRequest);
-            receivedBookingReviewsStream.sink.add(receivedBookingReviews);
+            Deal dealRequest = Deal.fromJson(document.data);
+            sentDeals.add(dealRequest);
+            sentDealStream.sink.add(sentDeals);
           }
         });
       }
     });
 
-    yield* receivedBookingReviewsStream.stream;
+    yield* sentDealStream.stream;
+  }
+
+  Stream<List<Deal>> getDealRequestsReceived(String userID) async* {
+    receivedDealStream = StreamController<List<Deal>>();
+    firestore
+        .collection(DEALS)
+        .document(userID)
+        .collection(RECEIVED_DEALS)
+        .snapshots()
+        .listen((querySnapshot) {
+      print(querySnapshot.documents.first.data);
+      if (querySnapshot.documents.isEmpty) {
+        receivedDealStream.sink.add(receivedDeals);
+      } else {
+        if (receivedDeals.isNotEmpty) {
+          receivedDeals.clear();
+        }
+        Future.forEach(querySnapshot.documents, (DocumentSnapshot document) {
+          if (document != null && document.exists) {
+            Deal deal = Deal.fromJson(document.data);
+            receivedDeals.add(deal);
+            receivedDealStream.sink.add(receivedDeals);
+          }
+        });
+      }
+    });
+
+    yield* receivedDealStream.stream;
   }
 
   Stream<List<User>> getGroupMembers(String channelID) async* {

@@ -7,24 +7,27 @@ import 'package:uuid/uuid.dart';
 import 'package:instachatty/model/InvoiceModel.dart';
 import 'package:instachatty/services/FirebaseHelper.dart';
 import 'package:instachatty/ui/controlPanels/PartnerControlPanel.dart';
+import 'package:instachatty/model/Deal.dart';
+import 'package:instachatty/ui/home/HomeScreen.dart';
+import 'package:instachatty/model/User.dart';
+import 'package:instachatty/model/Business.dart';
 
 class BookingRequestCard extends StatefulWidget {
-  BookingRequestCard({
-    @required this.bookingRequest,
-  });
-  final BookingRequest bookingRequest;
+  BookingRequestCard({@required this.deal, @required this.user, this.business});
+  final Deal deal;
+  final User user;
+  final Business business;
 
   @override
-  _BookingRequestCardState createState() => _BookingRequestCardState(
-        bookingRequest,
-      );
+  _BookingRequestCardState createState() =>
+      _BookingRequestCardState(deal, user, business);
 }
 
 class _BookingRequestCardState extends State<BookingRequestCard> {
-  _BookingRequestCardState(
-    this.bookingRequest,
-  );
-  final BookingRequest bookingRequest;
+  _BookingRequestCardState(this.deal, this.user, this.business);
+  final Deal deal;
+  final User user;
+  final Business business;
   TextEditingController _detailsController = TextEditingController();
   TextEditingController _chargeController = TextEditingController();
   TextEditingController _paymentOptionsController = TextEditingController();
@@ -65,7 +68,7 @@ class _BookingRequestCardState extends State<BookingRequestCard> {
                           ),
                         ),
                         Text(
-                          bookingRequest.customerName,
+                          deal.customerName,
                           style: TextStyle(
                             fontSize: 19.0,
                             color: Colors.white,
@@ -75,13 +78,13 @@ class _BookingRequestCardState extends State<BookingRequestCard> {
 
                         // Divider(),
                         Center(
-                          child: displayCircleImage(
-                              bookingRequest.sellerURL, 75, false),
+                          child:
+                              displayCircleImage(deal.customerURL, 75, false),
                         ),
                         Column(
                           children: [
                             Text(
-                              bookingRequest.details,
+                              deal.customerAdditionalDetails,
                               style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w300),
@@ -117,7 +120,7 @@ class _BookingRequestCardState extends State<BookingRequestCard> {
                                         height: 180.0,
                                         width: 190.0,
                                         child: Image.network(
-                                            bookingRequest.pictureDetailsURL),
+                                            deal.pictureDetailsURL),
                                       ),
                                     ),
                                     RaisedButton(
@@ -189,7 +192,7 @@ class _BookingRequestCardState extends State<BookingRequestCard> {
                                                                                     decoration: InputDecoration(
                                                                                       isDense: true,
                                                                                       contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                                                                                      hintText: 'Charge',
+                                                                                      hintText: 'Amount',
                                                                                       hintStyle: TextStyle(color: Colors.grey[400]),
                                                                                       focusedBorder: OutlineInputBorder(
                                                                                           borderRadius: BorderRadius.all(
@@ -263,7 +266,7 @@ class _BookingRequestCardState extends State<BookingRequestCard> {
                                                                               decoration: InputDecoration(
                                                                                 isDense: true,
                                                                                 contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                                                                                hintText: 'Additional Details',
+                                                                                hintText: 'Invoice Details',
                                                                                 hintStyle: TextStyle(color: Colors.grey[400]),
                                                                                 focusedBorder: OutlineInputBorder(
                                                                                     borderRadius: BorderRadius.all(
@@ -336,7 +339,7 @@ class _BookingRequestCardState extends State<BookingRequestCard> {
                                                                               decoration: InputDecoration(
                                                                                 isDense: true,
                                                                                 contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                                                                                hintText: 'Accepted payment options',
+                                                                                hintText: 'Payment Options',
                                                                                 hintStyle: TextStyle(color: Colors.grey[400]),
                                                                                 focusedBorder: OutlineInputBorder(
                                                                                     borderRadius: BorderRadius.all(
@@ -395,20 +398,12 @@ class _BookingRequestCardState extends State<BookingRequestCard> {
                                                                             .text
                                                                             .length >
                                                                         0) {
-                                                                  _sendToServer();
-                                                                  _chargeController
-                                                                      .clear();
-                                                                  _paymentOptionsController
-                                                                      .clear();
-                                                                  _detailsController
-                                                                      .clear();
-                                                                  Navigator.pop(
+                                                                  _sendToServer(
                                                                       context);
                                                                 } else {
                                                                   print(
                                                                       "make second thing");
                                                                 }
-                                                                setState(() {});
                                                               },
                                                               child: Text(
                                                                 'Submit',
@@ -444,12 +439,11 @@ class _BookingRequestCardState extends State<BookingRequestCard> {
           },
           child: SizedBox(
             child: ListTile(
-              leading: bookingRequest.customerURL.length > 1
+              leading: deal.customerURL.length > 1
                   ? Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        displayCircleImage(
-                            bookingRequest.customerURL, 40.0, false),
+                        displayCircleImage(deal.customerURL, 40.0, false),
                       ],
                     )
                   : null,
@@ -466,13 +460,16 @@ class _BookingRequestCardState extends State<BookingRequestCard> {
                         ),
                       ),
                       Text(
-                        '${bookingRequest.customerName}',
+                        '${deal.customerName}',
                         style: TextStyle(
                           color: Colors.white,
                         ),
                       ),
                       Text(
-                        bookingRequest.details,
+                        deal.customerAdditionalDetails.length > 20
+                            ? deal.customerAdditionalDetails.substring(0, 20) +
+                                "..."
+                            : '${deal.customerAdditionalDetails}',
                         style: TextStyle(
                           color: Colors.white,
                           fontStyle: FontStyle.italic,
@@ -492,43 +489,48 @@ class _BookingRequestCardState extends State<BookingRequestCard> {
     );
   }
 
-  _sendToServer() async {
+  _sendToServer(context) async {
     showProgress(context, 'Creating invoice', false);
     String invoiceID = uuid.v4();
-    try {
-      InvoiceModel invoice = InvoiceModel(
-        customerID: bookingRequest.customerID,
-        customerName: bookingRequest.customerName,
-        customerURL: bookingRequest.customerURL,
-        sellerID: bookingRequest.sellerID,
-        sellerName: bookingRequest.sellerName,
-        sellerURL: bookingRequest.sellerURL,
-        completed: false,
-        invoiceID: bookingRequest.requestID,
-        type: _paymentOptionsController.text,
-        charge: double.parse(_chargeController.text),
-        status: false,
-        additionalDetails: _detailsController.text,
-      );
-      await FireStoreUtils.firestore
-          .collection(INVOICES)
-          .document(bookingRequest.customerID)
-          .collection(RECEIVED_INVOICES)
-          .document(invoiceID)
-          .setData(invoice.toJson());
-      await FireStoreUtils.firestore
-          .collection(INVOICES)
-          .document(bookingRequest.sellerID)
-          .collection(SENT_INVOICES)
-          .document(invoiceID)
-          .setData(invoice.toJson());
 
-      hideProgress();
-    } catch (error) {
-      print(error.toString());
-      hideProgress();
-      print(error.toString());
+    deal.enquiryHandled = true;
+    deal.paymentType = _paymentOptionsController.text;
+    deal.amount = double.parse(_chargeController.text);
+    deal.partnerAdditionalDetails = _detailsController.text;
+
+    if (deal.customerInitiated) {
+      try {
+        await FireStoreUtils.updateCustomerCurrentSentDeal(deal);
+        await FireStoreUtils.updateSellerCurrentReceivedDeal(deal);
+      } catch (e) {
+        print(e.toString());
+      }
+    } else {
+      try {
+        await FireStoreUtils.updateSellerCurrentSentDeal(deal);
+        await FireStoreUtils.updateCustomerCurrentReceivedDeal(deal);
+      } catch (e) {
+        print(e.toString());
+      }
     }
+    hideProgress();
+    _chargeController.clear();
+    _paymentOptionsController.clear();
+    _detailsController.clear();
+    user.isPartner
+        ? pushAndRemoveUntil(
+            context,
+            HomeScreen(
+              user: user,
+              business: business,
+            ),
+            false)
+        : pushAndRemoveUntil(
+            context,
+            HomeScreen(
+              user: user,
+            ),
+            false);
   }
 
   @override

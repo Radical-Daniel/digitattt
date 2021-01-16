@@ -13,6 +13,7 @@ class MultiPick extends StatefulWidget {
 class _MultiPickState extends State<MultiPick> {
   List<Asset> images = List<Asset>();
   List<Image> imagesList = [];
+  List<Image> package = [];
   String _error = 'No Error Detected';
 
   @override
@@ -105,13 +106,15 @@ class _MultiPickState extends State<MultiPick> {
                     path,
                     fit: BoxFit.cover,
                   ));
-                  setState(() {});
+                  setState(() {
+                    package = imagesList;
+                  });
                 });
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (BuildContext context) => BottomBar(
-                      images: imagesList,
+                      images: package,
                     ),
                   ),
                 );

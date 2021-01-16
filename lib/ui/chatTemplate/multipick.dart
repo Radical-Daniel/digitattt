@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-
+import 'dart:io';
+import 'package:instachatty/ui/chatTemplate/bottom-bar.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:flutter_absolute_path/flutter_absolute_path.dart';
 
 class MultiPick extends StatefulWidget {
   @override
@@ -10,7 +12,8 @@ class MultiPick extends StatefulWidget {
 
 class _MultiPickState extends State<MultiPick> {
   List<Asset> images = List<Asset>();
-  String _error = 'No Error Dectected';
+  List<Image> imagesList = [];
+  String _error = 'No Error Detected';
 
   @override
   void initState() {
@@ -22,10 +25,14 @@ class _MultiPickState extends State<MultiPick> {
       crossAxisCount: 3,
       children: List.generate(images.length, (index) {
         Asset asset = images[index];
-        return AssetThumb(
-          asset: asset,
-          width: 300,
-          height: 300,
+        return FlatButton(
+          padding: EdgeInsets.all(0.0),
+          onPressed: () {},
+          child: AssetThumb(
+            asset: asset,
+            width: 300,
+            height: 300,
+          ),
         );
       }),
     );
@@ -33,17 +40,17 @@ class _MultiPickState extends State<MultiPick> {
 
   Future<void> loadAssets() async {
     List<Asset> resultList = List<Asset>();
-    String error = 'No Error Dectected';
+    String error = 'No Error Detected';
 
     try {
       resultList = await MultiImagePicker.pickImages(
-        maxImages: 300,
+        maxImages: 12,
         enableCamera: true,
         selectedAssets: images,
         cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
         materialOptions: MaterialOptions(
           actionBarColor: "#abcdef",
-          actionBarTitle: "Example App",
+          actionBarTitle: "Select Pictures",
           allViewTitle: "All Photos",
           useDetailsView: false,
           selectCircleStrokeColor: "#000000",
@@ -66,24 +73,53 @@ class _MultiPickState extends State<MultiPick> {
 
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: new Scaffold(
-        appBar: new AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Column(
-          children: <Widget>[
-            Center(child: Text('Error: $_error')),
-            RaisedButton(
-              child: Text("Pick images"),
-              onPressed: loadAssets,
+    return Container(
+      color: Colors.white54,
+      child: new Column(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 40.0),
+          ),
+          RaisedButton(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            child: Text(
+              "Pick Images",
+              style: TextStyle(
+                fontSize: 15.0,
+              ),
             ),
-            Expanded(
-              child: buildGridView(),
-            )
-          ],
-        ),
+            onPressed: loadAssets,
+          ),
+          Expanded(
+            child: buildGridView(),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 42.0),
+            child: FloatingActionButton(
+              onPressed: () async {
+                await Future.forEach(images, (Asset asset) async {
+                  String path = await FlutterAbsolutePath.getAbsolutePath(
+                      asset.identifier);
+                  imagesList.add(new Image.asset(
+                    path,
+                    fit: BoxFit.cover,
+                  ));
+                  setState(() {});
+                });
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => BottomBar(
+                      images: imagesList,
+                    ),
+                  ),
+                );
+              },
+              child: Icon(Icons.check_circle_outline),
+            ),
+          ),
+        ],
       ),
     );
   }

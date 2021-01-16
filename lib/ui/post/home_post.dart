@@ -9,6 +9,7 @@ import 'package:instachatty/model/MessageData.dart';
 import 'dart:io';
 import 'package:instachatty/model/ChatVideoContainer.dart';
 import 'package:instachatty/constants.dart';
+import 'package:instachatty/ui/chatTemplate/multipick.dart';
 
 class DropDownMenu extends StatefulWidget with EasyPopupChild {
   final _PopController controller = _PopController();
@@ -60,82 +61,7 @@ class _DropDownMenuState extends State<DropDownMenu>
     Size media = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Container(
-        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top + 50),
-        child: ClipRect(
-          child: SlideTransition(
-            position: _animation,
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
-              color: Colors.white,
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                children: [
-                  SizedBox(
-                    height: 30.0,
-                    width: double.infinity,
-                  ),
-                  Center(
-                    child: Container(
-                      clipBehavior: Clip.antiAlias,
-                      child: FlatButton(
-                        onPressed: () {
-                          _onCameraClick();
-                        },
-                        child: Center(
-                          child: Icon(
-                            Icons.add_a_photo_rounded,
-                            size: 60.0,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      width: media.width * 0.75,
-                      height: media.height * 0.30,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.black45,
-                      ),
-                    ),
-                  ),
-                  Form(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 28.0, vertical: 2.0),
-                      child: TextFormField(
-                        textAlign: TextAlign.center,
-                        decoration: InputDecoration(
-                          hintText: "What is happening?",
-                        ),
-                      ),
-                    ),
-                  ),
-                  RaisedButton(
-                    color: Color(COLOR_PRIMARY),
-                    onPressed: () {},
-                    child: Wrap(
-                      direction: Axis.vertical,
-                      alignment: WrapAlignment.center,
-                      children: [
-                        Text(
-                          "SEND",
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                        // Icon(
-                        //   Icons.send_outlined,
-                        //   color: Colors.white,
-                        // ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+      body: MultiPick(),
     );
   }
 

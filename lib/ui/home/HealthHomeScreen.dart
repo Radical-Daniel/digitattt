@@ -199,7 +199,7 @@ class _HealthHomeState extends State<HealthHome>
                                     context,
                                     MaterialPageRoute(
                                       builder: (BuildContext context) =>
-                                          DoctorServicesSearchScreen(
+                                          CardSearchScreen(
                                         user: user,
                                         type: "doctor",
                                       ),
@@ -223,7 +223,7 @@ class _HealthHomeState extends State<HealthHome>
                                   context,
                                   MaterialPageRoute(
                                     builder: (BuildContext context) =>
-                                        DoctorServicesSearchScreen(
+                                        CardSearchScreen(
                                       user: user,
                                       type: "pharmacist",
                                     ),
@@ -255,7 +255,7 @@ class _HealthHomeState extends State<HealthHome>
                                   context,
                                   MaterialPageRoute(
                                     builder: (BuildContext context) =>
-                                        DoctorServicesSearchScreen(
+                                        CardSearchScreen(
                                       user: user,
                                       type: "radiologist",
                                     ),
@@ -279,7 +279,7 @@ class _HealthHomeState extends State<HealthHome>
                                   context,
                                   MaterialPageRoute(
                                     builder: (BuildContext context) =>
-                                        DoctorServicesSearchScreen(
+                                        CardSearchScreen(
                                       user: user,
                                       type: "laboratory",
                                     ),

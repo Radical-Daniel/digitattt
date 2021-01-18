@@ -85,11 +85,11 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
   Geodesy geodesy = Geodesy();
   double _locationSliderValue = 15;
   final ImagePicker _imagePicker = ImagePicker();
-  PickedFile image;
+  File image;
   bool isLoadingPic = false;
   bool addLocationVisible = false;
   bool doneLoadingPic = false;
-  bool checked = false;
+  bool chipVisibility = false;
   String newAddressValue;
   TextEditingController _messageController = TextEditingController();
   TextEditingController _newAddressController = TextEditingController();
@@ -129,6 +129,7 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
     super.initState();
     requestID = uuid.v4();
     newAddressValue = user.address.address;
+    newAddress = user.address;
     setupStream();
   }
 
@@ -239,12 +240,18 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                           },
                         ),
                         IconButton(
-                          iconSize: 20,
-                          icon: Icon(Icons.close),
+                          iconSize: 25,
+                          icon: Icon(
+                            Icons.filter_list,
+                            color: chipVisibility
+                                ? Color(COLOR_ACCENT)
+                                : Color(COLOR_PRIMARY),
+                          ),
                           onPressed: () {
                             FocusScope.of(context).unfocus();
-                            controller.clear();
-                            _onSearchFilterChanged('');
+                            setState(() {
+                              chipVisibility = !chipVisibility;
+                            });
                           },
                         ),
                       ],
@@ -371,88 +378,94 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                 ),
               ),
             ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: FilterChip(
-                        checkmarkColor: Colors.white,
-                        selected: _filterList['doctor'],
-                        selectedColor: Color(COLOR_PRIMARY),
-                        onSelected: (bool value) {
-                          setState(() {
-                            _filterList['doctor'] = value;
-                          });
-                          _onSearchFilterChanged(controller.text);
-                        },
-                        label: Text(
-                          "DOCTOR",
-                          style: TextStyle(
-                              color: _filterList['doctor']
-                                  ? Colors.white
-                                  : Colors.black),
-                        ),
-                      )),
-                  Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: FilterChip(
-                        selected: _filterList['pharmacist'],
-                        selectedColor: Color(COLOR_PRIMARY),
-                        onSelected: (value) {
-                          setState(() {
-                            _filterList['pharmacist'] = value;
+            Visibility(
+              visible: chipVisibility,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: FilterChip(
+                          checkmarkColor: Colors.white,
+                          selected: _filterList['doctor'],
+                          selectedColor: Color(COLOR_PRIMARY),
+                          onSelected: (bool value) {
+                            setState(() {
+                              _filterList['doctor'] = value;
+                            });
                             _onSearchFilterChanged(controller.text);
-                          });
-                        },
-                        label: Text(
-                          "PHARMACIST",
-                          style: TextStyle(
-                              color: _filterList['pharmacist']
-                                  ? Colors.white
-                                  : Colors.black),
-                        ),
-                      )),
-                  Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: FilterChip(
-                        selected: _filterList['laboratory'],
-                        selectedColor: Color(COLOR_PRIMARY),
-                        onSelected: (bool value) {
-                          setState(() {
-                            _filterList['laboratory'] = value;
+                          },
+                          label: Text(
+                            "DOCTOR",
+                            style: TextStyle(
+                                color: _filterList['doctor']
+                                    ? Colors.white
+                                    : Colors.black),
+                          ),
+                        )),
+                    Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: FilterChip(
+                          checkmarkColor: Colors.white,
+                          selected: _filterList['pharmacist'],
+                          selectedColor: Color(COLOR_PRIMARY),
+                          onSelected: (value) {
+                            setState(() {
+                              _filterList['pharmacist'] = value;
+                              _onSearchFilterChanged(controller.text);
+                            });
+                          },
+                          label: Text(
+                            "PHARMACIST",
+                            style: TextStyle(
+                                color: _filterList['pharmacist']
+                                    ? Colors.white
+                                    : Colors.black),
+                          ),
+                        )),
+                    Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: FilterChip(
+                          checkmarkColor: Colors.white,
+                          selected: _filterList['laboratory'],
+                          selectedColor: Color(COLOR_PRIMARY),
+                          onSelected: (bool value) {
+                            setState(() {
+                              _filterList['laboratory'] = value;
+                              _onSearchFilterChanged(controller.text);
+                            });
+                          },
+                          label: Text(
+                            "LABORATORY",
+                            style: TextStyle(
+                                color: _filterList['laboratory']
+                                    ? Colors.white
+                                    : Colors.black),
+                          ),
+                        )),
+                    Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: FilterChip(
+                          checkmarkColor: Colors.white,
+                          selected: _filterList['radiologist'],
+                          selectedColor: Color(COLOR_PRIMARY),
+                          onSelected: (bool value) {
+                            setState(() {
+                              _filterList['radiologist'] = value;
+                            });
                             _onSearchFilterChanged(controller.text);
-                          });
-                        },
-                        label: Text(
-                          "LABORATORY",
-                          style: TextStyle(
-                              color: _filterList['laboratory']
-                                  ? Colors.white
-                                  : Colors.black),
-                        ),
-                      )),
-                  Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: FilterChip(
-                        selected: _filterList['radiologist'],
-                        selectedColor: Color(COLOR_PRIMARY),
-                        onSelected: (bool value) {
-                          setState(() {
-                            _filterList['radiologist'] = value;
-                          });
-                          _onSearchFilterChanged(controller.text);
-                        },
-                        label: Text(
-                          "RADIOLOGIST",
-                          style: TextStyle(
-                              color: _filterList['radiologist']
-                                  ? Colors.white
-                                  : Colors.black),
-                        ),
-                      )),
-                ],
+                          },
+                          label: Text(
+                            "RADIOLOGIST",
+                            style: TextStyle(
+                                color: _filterList['radiologist']
+                                    ? Colors.white
+                                    : Colors.black),
+                          ),
+                        )),
+                  ],
+                ),
               ),
             ),
             FutureBuilder<List<Business>>(
@@ -1345,8 +1358,8 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
 
   _onSearchFilterChanged(String searchedText) async {
     _searchResult.clear();
-    // List<String> selectedFilters =
-    //     _filterList.keys.where(((item) => _filterList[item] == true)).toList();
+    List<String> selectedFilters =
+        _filterList.keys.where(((item) => _filterList[item] == true)).toList();
     searchedText = searchedText.isEmpty ? ' ' : searchedText;
     _searchResult = _businesses
         .where((partner) =>
@@ -1357,7 +1370,9 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                     LatLng(partner.businessAddress.last['latitude'],
                         partner.businessAddress.last['longitude']),
                     LatLng(newAddress.latitude, newAddress.longitude)) <=
-                _locationSliderValue * 1000)
+                _locationSliderValue * 1000 &&
+            selectedFilters.every((filter) =>
+                partner.servicesMap.services[filter]['provides'] == true))
         .toList();
 
     setState(() {});
@@ -1492,34 +1507,24 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
             setState(() {
               isLoadingPic = true;
             });
-            Navigator.pop(context);
             File imageGot =
                 await ImagePicker.pickImage(source: ImageSource.gallery);
             String detailURL = uuid.v4();
+
             if (imageGot != null) {
-              final tempDir = await getTemporaryDirectory();
               showProgress(context, 'loading image', false);
-              CompressObject compressObject = CompressObject(
-                imageFile: File(imageGot.path), //image
-                path: tempDir.path, //compress to path
-                quality: 85, //first compress quality, default 80
-                step:
-                    2, //compress quality step, The bigger the fast, Smaller is more accurate, default 6
-                mode: CompressMode.LARGE2SMALL, //default AUTO
-              );
-              await Luban.compressImage(compressObject).then((imageComp) {
-                setState(() {
-                  imageFile = File(imageComp);
-                  print(imageComp);
-                  print("look aboveeeee");
-                });
-              });
               url = await fireStoreUtils.uploadBusinessImageToFireStorage(
-                  imageFile, detailURL);
+                  imageGot, detailURL);
+              hideProgress();
+              setState(() {});
+              await new Future.delayed(const Duration(
+                seconds: 5,
+              ));
+
               setState(() {
                 doneLoadingPic = true;
+                image = imageGot;
               });
-              hideProgress();
             }
           },
         ),

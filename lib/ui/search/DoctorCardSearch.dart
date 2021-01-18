@@ -23,6 +23,13 @@ import 'package:instachatty/ui/controlPanels/CustomerControlPanel.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:instachatty/model/notifications.dart';
 import 'package:instachatty/model/Deal.dart';
+import 'package:instachatty/model/ImageDetailModel.dart';
+import 'package:image_editor_pro/image_editor_pro.dart';
+import 'package:flutter_luban/flutter_luban.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:geodesy/geodesy.dart';
+import 'package:instachatty/model/AddressModel.dart';
 
 List<Business> _searchResult = [];
 Map<String, dynamic> _filterList = {
@@ -64,31 +71,36 @@ class BuildContactInfo extends ChangeNotifier {
   }
 }
 
-class DoctorServicesSearchScreen extends StatefulWidget {
+class CardSearchScreen extends StatefulWidget {
   final String type;
   final User user;
 
-  const DoctorServicesSearchScreen(
-      {Key key, @required this.user, @required this.type})
+  const CardSearchScreen({Key key, @required this.user, @required this.type})
       : super(key: key);
 
   @override
-  _DoctorServicesSearchScreenState createState() =>
-      _DoctorServicesSearchScreenState(user, type);
+  _CardSearchScreenState createState() => _CardSearchScreenState(user, type);
 }
 
-class _DoctorServicesSearchScreenState
-    extends State<DoctorServicesSearchScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+class _CardSearchScreenState extends State<CardSearchScreen> {
   final String type;
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  Geodesy geodesy = Geodesy();
   double _locationSliderValue = 15;
   final ImagePicker _imagePicker = ImagePicker();
-  PickedFile image;
+  File image;
   bool isLoadingPic = false;
+  bool addLocationVisible = false;
   bool doneLoadingPic = false;
+  bool chipVisibility = false;
+  String newAddressValue;
   TextEditingController _messageController = TextEditingController();
+  TextEditingController _newAddressController = TextEditingController();
+  TextEditingController _newCityController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   Uuid uuid = Uuid();
+  String requestID;
+  AddressModel newAddress;
   String details = '';
   final User user;
   String url = '';
@@ -109,16 +121,27 @@ class _DoctorServicesSearchScreenState
   //     wellnessChipSelected = false,
   //     studentChipSelected = false,
   //     educationChipSelected = false;
-  _DoctorServicesSearchScreenState(this.user, this.type);
-
+  _CardSearchScreenState(this.user, this.type);
+  Stream<List<ImageDetails>> _imageDetailStream;
   Future<List<Business>> _future;
   User selectedContact;
-
+  File imageFile;
   @override
   void initState() {
     _future = fireStoreUtils.getBusinesses(user.userID, true);
     super.initState();
+    requestID = uuid.v4();
+    newAddressValue = user.address.address;
+    newAddress = user.address;
+    _onSearchFilterChanged('');
+    setupStream();
   }
+
+  void setupStream() {
+    _imageDetailStream = fireStoreUtils.getDealDetailImagesSent(requestID);
+  }
+
+  File _image;
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +150,38 @@ class _DoctorServicesSearchScreenState
       value: selectedContact,
       child: Scaffold(
         key: _scaffoldKey,
+        drawer: CustomerControlPanel(user: user),
         appBar: AppBar(
+          leading: Stack(
+            children: [
+              IconButton(
+                icon: Icon(LineIcons.bell),
+                onPressed: () {
+                  _scaffoldKey.currentState.openDrawer();
+                },
+              ),
+              Positioned(
+                top: 13,
+                right: 24,
+                child: Container(
+                  height: 13,
+                  width: 13,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.red,
+                  ),
+                  child: Text(
+                    Notifications.notifications['count'].toString(),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
           centerTitle: true,
           backgroundColor: Color(COLOR_PRIMARY),
           title: Text(
@@ -162,21 +216,119 @@ class _DoctorServicesSearchScreenState
                           Radius.circular(360),
                         ),
                         borderSide: BorderSide(style: BorderStyle.none)),
-                    hintText: 'Search for a $type',
-                    suffixIcon: IconButton(
-                      iconSize: 20,
-                      icon: Icon(Icons.close),
-                      onPressed: () {
-                        FocusScope.of(context).unfocus();
-                        controller.clear();
-                        _onSearchFilterChanged('');
-                      },
+                    hintText: 'Search $type',
+                    suffixIcon: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          iconSize: 20,
+                          icon: IconButton(
+                            icon: Icon(
+                              Icons.location_on,
+                              color: addLocationVisible
+                                  ? Color(COLOR_ACCENT)
+                                  : Color(COLOR_PRIMARY),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                addLocationVisible = !addLocationVisible;
+                              });
+                            },
+                          ),
+                          onPressed: () {
+                            FocusScope.of(context).unfocus();
+                            controller.clear();
+                            _onSearchFilterChanged('');
+                          },
+                        ),
+                      ],
                     ),
                     // prefix: Icon(Icons.location_on_outlined),
                     prefixIcon: Icon(
                       Icons.search,
                       size: 20,
                     )),
+              ),
+            ),
+            Visibility(
+              visible: addLocationVisible,
+              child: Column(
+                children: [
+                  Text(
+                    "Measure From Location",
+                    style: TextStyle(
+                      color: Color(COLOR_PRIMARY),
+                      fontSize: 16.0,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 7.0),
+                    child: TextField(
+                      controller: _newAddressController,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
+                        isDense: true,
+                        fillColor: isDarkMode(context)
+                            ? Colors.grey[700]
+                            : Colors.grey[200],
+                        filled: true,
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(360),
+                            ),
+                            borderSide: BorderSide(style: BorderStyle.none)),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(360),
+                            ),
+                            borderSide: BorderSide(style: BorderStyle.none)),
+                        hintText: newAddressValue,
+                        prefixIcon: Icon(
+                          Icons.location_on,
+                          color: Color(COLOR_PRIMARY),
+                        ),
+                        suffixIcon: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.refresh,
+                                color: Color(COLOR_PRIMARY),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  newAddress = user.address;
+                                  newAddressValue = user.address.address;
+                                });
+                                _onSearchFilterChanged(controller.text);
+                              },
+                            ),
+                            IconButton(
+                                icon: Icon(Icons.check),
+                                color: Color(COLOR_PRIMARY),
+                                onPressed: () async {
+                                  if (_newAddressController.text.length > 0) {
+                                    newAddress = await AddressModel(
+                                            address: _newAddressController.text)
+                                        .geoAddress();
+                                    setState(() {
+                                      newAddressValue =
+                                          _newAddressController.text;
+                                      _newAddressController.clear();
+                                      _onSearchFilterChanged(controller.text);
+                                      addLocationVisible = false;
+                                    });
+                                  }
+                                }),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             Center(
@@ -197,7 +349,7 @@ class _DoctorServicesSearchScreenState
                 data: SliderThemeData(
                   thumbColor: Color(COLOR_PRIMARY),
                   disabledThumbColor: Colors.grey,
-                  activeTrackColor: Color(COLOR_PRIMARY_DARK),
+                  activeTrackColor: Color(COLOR_ACCENT),
                   activeTickMarkColor: Colors.black,
                 ),
                 child: Slider(
@@ -210,6 +362,7 @@ class _DoctorServicesSearchScreenState
                     setState(() {
                       _locationSliderValue = value;
                     });
+                    _onSearchFilterChanged(controller.text);
                   },
                 ),
               ),
@@ -233,7 +386,7 @@ class _DoctorServicesSearchScreenState
                   return Expanded(
                     child: Center(
                       child: Text(
-                        'No ${type}s found',
+                        'No $type Found',
                         style: TextStyle(fontSize: 18),
                       ),
                     ),
@@ -369,7 +522,7 @@ class _DoctorServicesSearchScreenState
                                                                                 MainAxisSize.max,
                                                                             children: <Widget>[
                                                                               Visibility(
-                                                                                visible: image.path.isNotEmpty && (!isLoadingPic || doneLoadingPic),
+                                                                                visible: isLoadingPic,
                                                                                 child: SizedBox(
                                                                                   height: 100.0,
                                                                                   child: !doneLoadingPic
@@ -460,65 +613,18 @@ class _DoctorServicesSearchScreenState
                                                                                                 ],
                                                                                               ),
                                                                                             ))),
-                                                                                  ],
-                                                                                ),
-                                                                              ),
-                                                                              Padding(
-                                                                                padding: const EdgeInsets.only(top: 8.0),
-                                                                                child: Row(
-                                                                                  children: <Widget>[
-                                                                                    Expanded(
-                                                                                        child: Padding(
-                                                                                            padding: const EdgeInsets.only(left: 2.0, right: 2, top: 5.0),
-                                                                                            child: Container(
-                                                                                              padding: EdgeInsets.all(2),
-                                                                                              decoration: ShapeDecoration(
-                                                                                                shape: OutlineInputBorder(
-                                                                                                    borderRadius: BorderRadius.all(
-                                                                                                      Radius.circular(360),
-                                                                                                    ),
-                                                                                                    borderSide: BorderSide(style: BorderStyle.none)),
-                                                                                                color: isDarkMode(context) ? Colors.grey[700] : Colors.grey.shade200,
-                                                                                              ),
-                                                                                              child: Row(
-                                                                                                children: <Widget>[
-                                                                                                  Expanded(
-                                                                                                    child: TextField(
-                                                                                                      onChanged: (s) {
-                                                                                                        setState(() {});
-                                                                                                      },
-                                                                                                      onTap: () {
-                                                                                                        setState(() {
-                                                                                                          // currentRecordingState = RecordingState.HIDDEN;
-                                                                                                        });
-                                                                                                      },
-                                                                                                      textAlignVertical: TextAlignVertical.center,
-                                                                                                      controller: _addressController,
-                                                                                                      decoration: InputDecoration(
-                                                                                                        isDense: true,
-                                                                                                        contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                                                                                                        hintText: 'Delivery Address',
-                                                                                                        hintStyle: TextStyle(color: Colors.grey[400]),
-                                                                                                        focusedBorder: OutlineInputBorder(
-                                                                                                            borderRadius: BorderRadius.all(
-                                                                                                              Radius.circular(360),
-                                                                                                            ),
-                                                                                                            borderSide: BorderSide(style: BorderStyle.none)),
-                                                                                                        enabledBorder: OutlineInputBorder(
-                                                                                                            borderRadius: BorderRadius.all(
-                                                                                                              Radius.circular(360),
-                                                                                                            ),
-                                                                                                            borderSide: BorderSide(style: BorderStyle.none)),
-                                                                                                      ),
-                                                                                                      textCapitalization: TextCapitalization.sentences,
-                                                                                                      maxLines: 5,
-                                                                                                      minLines: 1,
-                                                                                                      keyboardType: TextInputType.multiline,
-                                                                                                    ),
-                                                                                                  ),
-                                                                                                ],
-                                                                                              ),
-                                                                                            ))),
+                                                                                    // IconButton(
+                                                                                    //     icon: Icon(
+                                                                                    //       Icons.send,
+                                                                                    //       color: _messageController.text.isEmpty ? Color(COLOR_PRIMARY).withOpacity(.5) : Color(COLOR_PRIMARY),
+                                                                                    //     ),
+                                                                                    //     onPressed: () async {
+                                                                                    //       if (_messageController.text.isNotEmpty) {
+                                                                                    //         // _sendMessage(_messageController.text, Url(mime: '', url: ''), '');
+                                                                                    //         _messageController.clear();
+                                                                                    //         setState(() {});
+                                                                                    //       }
+                                                                                    //     })
                                                                                   ],
                                                                                 ),
                                                                               ),
@@ -878,13 +984,13 @@ class _DoctorServicesSearchScreenState
                                                                                                 ),
                                                                                                 child: Row(
                                                                                                   children: <Widget>[
-                                                                                                    InkWell(
-                                                                                                      onTap: () => {},
-                                                                                                      child: Icon(
-                                                                                                        Icons.mic,
-                                                                                                        // color: currentRecordingState == RecordingState.HIDDEN ? Color(COLOR_PRIMARY) : Colors.red,
-                                                                                                      ),
-                                                                                                    ),
+                                                                                                    // InkWell(
+                                                                                                    //   onTap: () => {},
+                                                                                                    //   child: Icon(
+                                                                                                    //     Icons.mic,
+                                                                                                    //     // color: currentRecordingState == RecordingState.HIDDEN ? Color(COLOR_PRIMARY) : Colors.red,
+                                                                                                    //   ),
+                                                                                                    // ),
                                                                                                     Expanded(
                                                                                                       child: TextField(
                                                                                                         onChanged: (s) {
@@ -1131,17 +1237,40 @@ class _DoctorServicesSearchScreenState
     );
   }
 
+  // Future<void> getimageditor() {
+  //   final geteditimage =
+  //       Navigator.push(context, MaterialPageRoute(builder: (context) {
+  //     return ImageEditorPro(
+  //       appBarColor: Colors.blue,
+  //       bottomBarColor: Colors.blue,
+  //     );
+  //   })).then((geteditimage) {
+  //     if (geteditimage != null) {
+  //       setState(() {
+  //         _image = geteditimage;
+  //       });
+  //     }
+  //   }).catchError((er) {
+  //     print(er);
+  //   });
+  // }
+
   _onSearchFilterChanged(String searchedText) async {
     _searchResult.clear();
-    List<String> selectedFilters =
-        _filterList.keys.where(((item) => _filterList[item] == true)).toList();
-    print(selectedFilters);
     searchedText = searchedText.isEmpty ? ' ' : searchedText;
     _searchResult = _businesses
-        .where((partner) => partner.businessName
-            .toLowerCase()
-            .contains(searchedText.toLowerCase()))
+        .where((partner) =>
+            partner.businessName
+                .toLowerCase()
+                .contains(searchedText.toLowerCase()) &&
+            geodesy.distanceBetweenTwoGeoPoints(
+                    LatLng(partner.businessAddress.last['latitude'],
+                        partner.businessAddress.last['longitude']),
+                    LatLng(newAddress.latitude, newAddress.longitude)) <=
+                _locationSliderValue * 1000 &&
+            partner.servicesMap.services[type]['provides'] == true)
         .toList();
+
     setState(() {});
   }
 
@@ -1198,20 +1327,7 @@ class _DoctorServicesSearchScreenState
   _sendToServer(Business business, detail, customerDeliveryDetails, serviceName,
       url) async {
     showProgress(context, 'Creating request', false);
-    String requestID = uuid.v4();
     try {
-      // BookingRequest bookingRequest = BookingRequest(
-      //   details: detail,
-      //   pictureDetailsURL: url,
-      //   customerID: user.userID,
-      //   customerName: user.fullName(),
-      //   customerURL: user.profilePictureURL,
-      //   sellerID: business.businessID,
-      //   sellerName: business.businessName,
-      //   handled: false,
-      //   serviceName: serviceName,
-      //   requestID: requestID,
-      // );
       Deal deal = Deal(
         customerID: user.userID,
         customerName: user.fullName(),
@@ -1221,7 +1337,7 @@ class _DoctorServicesSearchScreenState
         sellerURL: business.businessLogoURL,
         customerInitiated: true,
         serviceName: serviceName,
-        pictureDetailsURL: "",
+        pictureDetailsURL: url,
         requestID: requestID,
         customerAdditionalDetails: detail,
         customerDeliveryDetails: customerDeliveryDetails,
@@ -1287,17 +1403,23 @@ class _DoctorServicesSearchScreenState
             setState(() {
               isLoadingPic = true;
             });
-            Navigator.pop(context);
-            PickedFile imageGot =
-                await _imagePicker.getImage(source: ImageSource.gallery);
+            File imageGot =
+                await ImagePicker.pickImage(source: ImageSource.gallery);
             String detailURL = uuid.v4();
+
             if (imageGot != null) {
+              showProgress(context, 'loading image', false);
               url = await fireStoreUtils.uploadBusinessImageToFireStorage(
-                  File(imageGot.path), detailURL);
+                  imageGot, detailURL);
+              hideProgress();
+              setState(() {});
+              await new Future.delayed(const Duration(
+                seconds: 5,
+              ));
+
               setState(() {
-                image = imageGot;
                 doneLoadingPic = true;
-                isLoadingPic = false;
+                image = imageGot;
               });
             }
           },

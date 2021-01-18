@@ -151,7 +151,8 @@ class RealEstateDetails extends StatelessWidget {
                               displayCircleImage(
                                   'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2FnP9LsJtV0NZIhLpsgrPGjnw7N6l1.png?alt=media&token=7619b239-8682-4f84-bb55-b5b1c4d35300',
                                   70.0,
-                                  false),
+                                  false,
+                                  "Michael Alec"),
                               Text("Michael Alec"),
                             ],
                           ),
@@ -166,7 +167,8 @@ class RealEstateDetails extends StatelessWidget {
                               displayCircleImage(
                                   'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2FlKPkdgcrBCNr8azqb1c9WH56mQi1.png?alt=media&token=bfdbd43e-1964-4279-b80c-fc907c37fc9d',
                                   70.0,
-                                  false),
+                                  false,
+                                  "Niel Walker"),
                               Text("Niel Walker"),
                             ],
                           ),
@@ -175,7 +177,8 @@ class RealEstateDetails extends StatelessWidget {
                               displayCircleImage(
                                   'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2FnP9LsJtV0NZIhLpsgrPGjnw7N6l1.png?alt=media&token=7619b239-8682-4f84-bb55-b5b1c4d35300',
                                   70.0,
-                                  false),
+                                  false,
+                                  "James Ford"),
                               Text("James Ford"),
                             ],
                           ),
@@ -187,7 +190,8 @@ class RealEstateDetails extends StatelessWidget {
                               displayCircleImage(
                                   'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2Fc8befd09-542f-472d-a6d4-fb063c64962b.png?alt=media&token=d0b7d3be-641c-4fcf-b47a-e3450f5e75c4',
                                   70.0,
-                                  false),
+                                  false,
+                                  "Michael Alec"),
                               Text("Michael Alec"),
                             ],
                           ),
@@ -199,7 +203,8 @@ class RealEstateDetails extends StatelessWidget {
                               displayCircleImage(
                                   'https://firebasestorage.googleapis.com/v0/b/digitat-80a24.appspot.com/o/images%2FlKPkdgcrBCNr8azqb1c9WH56mQi1.png?alt=media&token=bfdbd43e-1964-4279-b80c-fc907c37fc9d',
                                   70.0,
-                                  false),
+                                  false,
+                                  "Niel Walker"),
                               Text("Niel Walker"),
                             ],
                           ),

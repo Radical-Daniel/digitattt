@@ -640,7 +640,8 @@ class _ChatScreenState extends State<ChatScreen> {
           Padding(
               padding: const EdgeInsetsDirectional.only(end: 12.0),
               child: _myMessageContentWidget(messageData)),
-          displayCircleImage(messageData.senderProfilePictureURL, 35, false)
+          displayCircleImage(messageData.senderProfilePictureURL, 35, false,
+              '${messageData.senderFirstName} ${messageData.senderLastName}')
         ],
       ),
     );
@@ -835,7 +836,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 ? Alignment.bottomRight
                 : Alignment.bottomLeft,
             children: <Widget>[
-              displayCircleImage(sender.profilePictureURL, 35, false),
+              displayCircleImage(
+                  sender.profilePictureURL, 35, false, sender.fullName()),
               Positioned.directional(
                   textDirection: Directionality.of(context),
                   end: 1,

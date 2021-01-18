@@ -16,6 +16,7 @@ import 'package:instachatty/ui/booking/bookingRequestCardSender.dart';
 import 'package:instachatty/model/Deal.dart';
 import 'package:instachatty/ui/payment/PaidCustomer.dart';
 import 'package:instachatty/ui/booking/AppointmentCustomerCard.dart';
+import 'package:instachatty/ui/chatTemplate/SliderCarousel.dart';
 
 Color color1 = Color(COLOR_PRIMARY);
 Color color2 = Color(COLOR_PRIMARY_DARK);
@@ -35,16 +36,20 @@ void resetNotifications() {
 }
 
 class CustomerControlPanel extends StatefulWidget {
+  final List<String> images;
   final User user;
-  CustomerControlPanel({@required this.user});
+  CustomerControlPanel({@required this.user, this.images});
 
   @override
-  _CustomerControlPanelState createState() => _CustomerControlPanelState(user);
+  _CustomerControlPanelState createState() =>
+      _CustomerControlPanelState(user, images);
 }
 
 class _CustomerControlPanelState extends State<CustomerControlPanel> {
+  final List<String> images;
+
   final User user;
-  _CustomerControlPanelState(this.user);
+  _CustomerControlPanelState(this.user, this.images);
   final fireStoreUtils = FireStoreUtils();
   Stream<List<Deal>> _dealRequestsStream;
 
@@ -125,9 +130,35 @@ class _CustomerControlPanelState extends State<CustomerControlPanel> {
                   ),
                   Stack(
                     children: <Widget>[
-                      Icon(
-                        Icons.notifications_none,
-                        color: Colors.white,
+                      IconButton(
+                        icon: Icon(
+                          Icons.slideshow,
+                          size: 30.0,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return Dialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(40),
+                                  ),
+                                  elevation: 16,
+                                  child: Container(
+                                    height: 520,
+                                    width: 335,
+                                    child: SliderCarousel(
+                                      images: images,
+                                      user: user,
+                                    ),
+                                    // : SliderCarousel(
+                                    //     user: user,
+                                    //   ),
+                                  ),
+                                );
+                              });
+                        },
                       ),
                       Visibility(
                         visible: Notifications.notifications['visible'],
@@ -175,12 +206,11 @@ class _CustomerControlPanelState extends State<CustomerControlPanel> {
             height: 95,
             width: 95,
             decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: new Border.all(color: Color(COLOR_PRIMARY), width: 3),
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: new NetworkImage(user.profilePictureURL),
-                )),
+              shape: BoxShape.circle,
+              border: new Border.all(color: Color(COLOR_PRIMARY), width: 3),
+            ),
+            child: displayCircleImage(
+                user.profilePictureURL, 50.0, false, user.fullName()),
           ),
           SizedBox(height: 5),
           Row(
@@ -324,6 +354,18 @@ class _CustomerControlPanelState extends State<CustomerControlPanel> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
                 child: CircularProgressIndicator(),
+              );
+            } else if (!snapshot.hasData || snapshot.data.isEmpty) {
+              return Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'No bookings found',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ],
+                ),
               );
             } else {
               return ListView.builder(

@@ -178,7 +178,8 @@ class _PartnerControlPanelState extends State<PartnerControlPanel> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          displayCircleImage(business.businessLogoURL, 100.0, false),
+          displayCircleImage(
+              business.businessLogoURL, 100.0, false, business.businessName),
           SizedBox(height: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

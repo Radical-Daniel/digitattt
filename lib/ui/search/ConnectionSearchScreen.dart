@@ -160,7 +160,7 @@ class _ConnectionSearchScreenState extends State<ConnectionSearchScreen> {
             data: SliderThemeData(
               thumbColor: Color(COLOR_PRIMARY),
               disabledThumbColor: Colors.grey,
-              activeTrackColor: Color(COLOR_PRIMARY_DARK),
+              activeTrackColor: Color(COLOR_ACCENT),
               activeTickMarkColor: Colors.black,
             ),
             child: Slider(
@@ -326,7 +326,8 @@ class _ConnectionSearchScreenState extends State<ConnectionSearchScreen> {
                                   leading: displayCircleImage(
                                       contact.user.profilePictureURL,
                                       55,
-                                      false),
+                                      false,
+                                      contact.user.fullName()),
                                   title: Text(
                                     '${contact.user.fullName()}',
                                     style: TextStyle(
@@ -403,7 +404,8 @@ class _ConnectionSearchScreenState extends State<ConnectionSearchScreen> {
                                     leading: displayCircleImage(
                                         contact.user.profilePictureURL,
                                         55,
-                                        false),
+                                        false,
+                                        contact.user.fullName()),
                                     title: Text(
                                       '${contact.user.fullName()}',
                                       style: TextStyle(

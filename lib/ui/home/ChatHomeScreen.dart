@@ -112,7 +112,8 @@ class _HomeState extends State<ChatHomeScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        displayCircleImage(user.profilePictureURL, 75, false),
+                        displayCircleImage(
+                            user.profilePictureURL, 75, false, user.fullName()),
                         Padding(
                           padding: const EdgeInsets.only(top: 5.0),
                           child: Row(

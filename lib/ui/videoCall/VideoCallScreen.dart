@@ -210,7 +210,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                         widget.homeConversationModel.members.first
                             .profilePictureURL,
                         75,
-                        true),
+                        true,
+                        widget.homeConversationModel.members.first.fullName()),
                     SizedBox(height: 10),
                     Text(
                       widget.isCaller

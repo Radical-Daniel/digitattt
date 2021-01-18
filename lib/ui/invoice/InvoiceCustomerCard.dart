@@ -187,7 +187,8 @@ class _InvoiceCardState extends State<InvoiceCard> {
 
           // Divider(),
           Center(
-            child: displayCircleImage(deal.sellerURL, 75, false),
+            child:
+                displayCircleImage(deal.sellerURL, 75, false, deal.sellerName),
           ),
           Column(
             children: [

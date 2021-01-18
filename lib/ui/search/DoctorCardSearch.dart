@@ -611,7 +611,9 @@ class _DoctorServicesSearchScreenState
                                                           business
                                                               .businessLogoURL,
                                                           105,
-                                                          false),
+                                                          false,
+                                                          business
+                                                              .businessName),
                                                     ),
                                                     Column(
                                                       children: [
@@ -666,7 +668,10 @@ class _DoctorServicesSearchScreenState
                                             });
                                       },
                                       leading: displayCircleImage(
-                                          business.businessLogoURL, 55, false),
+                                          business.businessLogoURL,
+                                          55,
+                                          false,
+                                          business.businessName),
                                       title: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -1023,7 +1028,9 @@ class _DoctorServicesSearchScreenState
                                                             business
                                                                 .businessLogoURL,
                                                             105,
-                                                            false),
+                                                            false,
+                                                            business
+                                                                .businessName),
                                                       ),
                                                       Column(
                                                         children: [
@@ -1083,7 +1090,8 @@ class _DoctorServicesSearchScreenState
                                         leading: displayCircleImage(
                                             business.businessLogoURL,
                                             55,
-                                            false),
+                                            false,
+                                            business.businessName),
                                         title: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,

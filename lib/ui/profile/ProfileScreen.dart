@@ -44,14 +44,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               alignment: Alignment.bottomCenter,
               children: <Widget>[
                 Center(
-                    child:
-                        displayCircleImage(user.profilePictureURL, 130, false)),
+                    child: displayCircleImage(
+                        user.profilePictureURL, 130, false, user.fullName())),
                 Positioned.directional(
                   textDirection: Directionality.of(context),
                   start: 80,
                   end: 0,
                   child: FloatingActionButton(
-                      backgroundColor: Color(COLOR_ACCENT),
+                      backgroundColor: Color(COLOR_PRIMARY),
                       child: Icon(
                         Icons.camera_alt,
                         color:

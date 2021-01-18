@@ -10,12 +10,15 @@ import 'dart:io';
 import 'package:instachatty/model/ChatVideoContainer.dart';
 import 'package:instachatty/constants.dart';
 import 'package:instachatty/ui/chatTemplate/multipick.dart';
+import 'package:instachatty/model/User.dart';
 
 class DropDownMenu extends StatefulWidget with EasyPopupChild {
+  final User user;
+  DropDownMenu({this.user});
   final _PopController controller = _PopController();
 
   @override
-  _DropDownMenuState createState() => _DropDownMenuState();
+  _DropDownMenuState createState() => _DropDownMenuState(user);
 
   @override
   dismiss() {
@@ -25,6 +28,8 @@ class DropDownMenu extends StatefulWidget with EasyPopupChild {
 
 class _DropDownMenuState extends State<DropDownMenu>
     with SingleTickerProviderStateMixin {
+  final User user;
+  _DropDownMenuState(this.user);
   FireStoreUtils _fireStoreUtils = FireStoreUtils();
   final ImagePicker _imagePicker = ImagePicker();
 
@@ -61,7 +66,9 @@ class _DropDownMenuState extends State<DropDownMenu>
     Size media = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: MultiPick(),
+      body: MultiPick(
+        user: user,
+      ),
     );
   }
 

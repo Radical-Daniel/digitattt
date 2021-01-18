@@ -27,6 +27,7 @@ import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:instachatty/model/BookingRequest.dart';
 import 'package:instachatty/model/Deal.dart';
 import 'package:instachatty/model/ImageDetailModel.dart';
+import 'package:instachatty/model/momentModel.dart';
 
 class FireStoreUtils {
   static FirebaseMessaging firebaseMessaging = FirebaseMessaging();
@@ -37,6 +38,7 @@ class FireStoreUtils {
   List<Employee> businessPartners = [];
   List<User> pendingList = [];
   List<User> receivedRequests = [];
+  Moment myMoment;
   List<ContactModel> contactsList = [];
   StreamController<List<HomeConversationModel>> conversationsStream;
   StreamController<List<ImageDetails>> imageDetailStream;
@@ -56,6 +58,18 @@ class FireStoreUtils {
     } else {
       return null;
     }
+  }
+
+  Future<Moment> getMyMoment(String uid) async {
+    await firestore
+        .collection(MOMENTS)
+        .document(uid)
+        .collection(MY_MOMENTS)
+        .getDocuments()
+        .then((value) =>
+            myMoment = new Moment.fromJson(value.documents.last.data));
+    // myMoment = moment;
+    return myMoment;
   }
 
   Future<Business> getCurrentBusiness(String uid) async {
@@ -144,6 +158,14 @@ class FireStoreUtils {
   }
 
   Future<String> uploadUserImageToFireStorage(File image, String userID) async {
+    StorageReference upload = storage.child("images/$userID.png");
+    StorageUploadTask uploadTask = upload.putFile(image);
+    var downloadUrl = await (await uploadTask.onComplete).ref.getDownloadURL();
+    return downloadUrl.toString();
+  }
+
+  Future<String> uploadUserImageMomentToFireStorage(
+      File image, String userID) async {
     StorageReference upload = storage.child("images/$userID.png");
     StorageUploadTask uploadTask = upload.putFile(image);
     var downloadUrl = await (await uploadTask.onComplete).ref.getDownloadURL();
@@ -641,7 +663,6 @@ class FireStoreUtils {
         .collection(SENT_DEALS)
         .snapshots()
         .listen((querySnapshot) {
-      print(querySnapshot.documents.first.data);
       if (querySnapshot.documents.isEmpty) {
         sentDealStream.sink.add(sentDeals);
       } else {

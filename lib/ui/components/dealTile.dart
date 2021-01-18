@@ -45,7 +45,7 @@ class DealTile extends StatelessWidget {
       leading: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          displayCircleImage(deal.sellerURL, 40.0, false),
+          displayCircleImage(deal.sellerURL, 40.0, false, deal.sellerName),
         ],
       ),
     );

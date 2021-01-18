@@ -71,8 +71,8 @@ class _InvoicePartnerCardState extends State<InvoicePartnerCard> {
 
                           // Divider(),
                           Center(
-                            child:
-                                displayCircleImage(deal.customerURL, 75, false),
+                            child: displayCircleImage(
+                                deal.customerURL, 75, false, deal.customerName),
                           ),
                           Column(
                             children: [
@@ -441,7 +441,8 @@ class _InvoicePartnerCardState extends State<InvoicePartnerCard> {
               leading: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  displayCircleImage(deal.customerURL, 40.0, false),
+                  displayCircleImage(
+                      deal.customerURL, 40.0, false, deal.customerName),
                 ],
               ),
             ),

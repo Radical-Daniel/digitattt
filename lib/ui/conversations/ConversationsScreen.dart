@@ -177,7 +177,8 @@ class _ConversationsState extends State<ConversationsScreen> {
                                             displayCircleImage(
                                                 friend.profilePictureURL,
                                                 50,
-                                                false),
+                                                false,
+                                                friend.fullName()),
                                             Expanded(
                                               child: Container(
                                                 width: 75,
@@ -251,7 +252,8 @@ class _ConversationsState extends State<ConversationsScreen> {
                                               displayCircleImage(
                                                   friend.profilePictureURL,
                                                   50,
-                                                  false),
+                                                  false,
+                                                  friend.fullName()),
                                               Expanded(
                                                 child: Container(
                                                   width: 75,
@@ -400,12 +402,19 @@ class _ConversationsState extends State<ConversationsScreen> {
                   Stack(
                     overflow: Overflow.visible,
                     children: <Widget>[
-                      displayCircleImage(user1Image, 44, false),
+                      displayCircleImage(user1Image, 44, false,
+                          homeConversationModel.members.first.fullName()),
                       Positioned.directional(
                           textDirection: Directionality.of(context),
                           start: -16,
                           bottom: -12.8,
-                          child: displayCircleImage(user2Image, 44, true))
+                          child: displayCircleImage(
+                              user2Image,
+                              44,
+                              true,
+                              homeConversationModel.members
+                                  .elementAt(1)
+                                  .fullName()))
                     ],
                   ),
                   Expanded(
@@ -456,7 +465,8 @@ class _ConversationsState extends State<ConversationsScreen> {
                     displayCircleImage(
                         homeConversationModel.members.first.profilePictureURL,
                         60,
-                        false),
+                        false,
+                        homeConversationModel.members.first.fullName()),
                     Positioned.directional(
                         textDirection: Directionality.of(context),
                         end: 2.4,

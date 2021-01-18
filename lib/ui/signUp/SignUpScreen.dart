@@ -15,6 +15,8 @@ import 'package:instachatty/services/FirebaseHelper.dart';
 import 'package:instachatty/services/Helper.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:instachatty/model/AddressModel.dart';
+import 'package:country_state_city_picker/country_state_city_picker.dart';
 
 File _image;
 
@@ -28,10 +30,18 @@ class _SignUpState extends State<SignUpScreen> {
   TextEditingController _passwordController = new TextEditingController();
   TextEditingController _firstNameController = new TextEditingController();
   TextEditingController _lastNameController = new TextEditingController();
+  TextEditingController _businessAddressController =
+      new TextEditingController();
   GlobalKey<FormState> _key = new GlobalKey();
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  AddressModel address;
+
   String firstName,
       lastName,
+      cityValue,
+      stateValue,
+      countryValue,
+      userAddress,
       email,
       mobile,
       password,
@@ -201,6 +211,69 @@ class _SignUpState extends State<SignUpScreen> {
               )
             ],
           ),
+        ),
+        Visibility(
+          visible: !_codeSent,
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 18.0, vertical: 2.0),
+            child: SelectState(
+              onCityChanged: (value) {
+                setState(() {
+                  cityValue = value;
+                });
+              },
+              onCountryChanged: (value) {
+                setState(() {
+                  countryValue = value;
+                });
+              },
+              onStateChanged: (value) {
+                print(value);
+              },
+            ),
+          ),
+        ),
+        Visibility(
+          visible: !_codeSent,
+          child: ConstrainedBox(
+              constraints: BoxConstraints(minWidth: double.infinity),
+              child: Padding(
+                  padding:
+                      const EdgeInsets.only(top: 16.0, right: 8.0, left: 8.0),
+                  child: TextFormField(
+                      onSaved: (String val) {
+                        userAddress = '$val $cityValue $countryValue';
+                      },
+                      controller: _businessAddressController,
+                      textInputAction: TextInputAction.next,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      onFieldSubmitted: (_) =>
+                          FocusScope.of(context).nextFocus(),
+                      decoration: InputDecoration(
+                        contentPadding: new EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 16),
+                        fillColor:
+                            isDarkMode(context) ? Colors.black54 : Colors.white,
+                        hintText: 'Business address',
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25.0),
+                            borderSide: BorderSide(
+                                color: Color(COLOR_PRIMARY), width: 2.0)),
+                        errorBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Theme.of(context).errorColor),
+                          borderRadius: BorderRadius.circular(25.0),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Theme.of(context).errorColor),
+                          borderRadius: BorderRadius.circular(25.0),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey[200]),
+                          borderRadius: BorderRadius.circular(25.0),
+                        ),
+                      )))),
         ),
         Visibility(
           visible: !_codeSent,
@@ -597,6 +670,7 @@ class _SignUpState extends State<SignUpScreen> {
           profilePicUrl = await FireStoreUtils()
               .uploadUserImageToFireStorage(_image, result.user.uid);
         }
+
         User user = User(
             email: email,
             firstName: firstName,
@@ -606,6 +680,7 @@ class _SignUpState extends State<SignUpScreen> {
             active: true,
             fcmToken: await FirebaseMessaging().getToken(),
             lastName: lastName,
+            address: await AddressModel(address: userAddress).geoAddress(),
             interestMap: interest,
             isPartner: isPartner,
             partnerEnabled: false,

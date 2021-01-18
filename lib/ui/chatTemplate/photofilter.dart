@@ -8,11 +8,15 @@ import 'package:image/image.dart' as imageLib;
 import 'package:image_picker/image_picker.dart';
 
 class Philter extends StatefulWidget {
+  final String imageAdded;
+  Philter(this.imageAdded);
   @override
-  _PhilterState createState() => new _PhilterState();
+  _PhilterState createState() => new _PhilterState(imageAdded);
 }
 
 class _PhilterState extends State<Philter> {
+  final String imageAdded;
+  _PhilterState(this.imageAdded);
   String fileName;
   List<Filter> filters = presetFiltersList;
   File imageFile;

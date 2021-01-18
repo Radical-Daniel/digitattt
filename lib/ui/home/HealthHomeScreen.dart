@@ -137,14 +137,15 @@ class _HealthHomeState extends State<HealthHome>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  displayCircleImage(user.profilePictureURL, 35, false),
+                  displayCircleImage(
+                      user.profilePictureURL, 35, false, user.fullName()),
                   SizedBox(
                     width: 5,
                   ),
                   RaisedButton(
                     color: Colors.white70,
                     onPressed: () {
-                      EasyPopup.show(context, DropDownMenu(),
+                      EasyPopup.show(context, DropDownMenu(user: user),
                           offsetLT: Offset(
                               0, MediaQuery.of(context).padding.top + 50));
                     },

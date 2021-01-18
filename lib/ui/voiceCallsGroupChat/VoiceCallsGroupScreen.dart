@@ -183,7 +183,8 @@ class _VoiceCallsGroupScreenState extends State<VoiceCallsGroupScreen> {
               displayCircleImage(
                   widget.homeConversationModel.members.first.profilePictureURL,
                   75,
-                  true),
+                  true,
+                  widget.homeConversationModel.members.first.fullName()),
               SizedBox(height: 10),
               Padding(
                 padding: EdgeInsets.all(8.0),

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 const FINISHED_ON_BOARDING = 'finishedOnBoarding';
 //const COLOR_ACCENT = 0xFFEB0F09;
-const COLOR_ACCENT = 0xFF7693f8;
+const COLOR_ACCENT = 0xFF996515;
 //const COLOR_PRIMARY_DARK = 0xFF4F6467;
 const COLOR_PRIMARY_DARK = 0xFF003c94;
 //const COLOR_PRIMARY = 0xFF3E66C5;
@@ -19,6 +19,8 @@ const SOCIAL_GRAPH = 'social_graph';
 const SENT_INVOICES = 'outbound_invoice';
 const RECEIVED_INVOICES = 'inbound_invoices';
 const DEALS = 'deals';
+const MOMENTS = 'moments';
+const MY_MOMENTS = 'my_moments';
 const DETAILS = 'details';
 const DETAILS_IMAGES = 'details_images';
 const SENT_DEALS = 'outbound_deals';

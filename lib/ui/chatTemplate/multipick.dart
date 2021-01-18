@@ -4,16 +4,35 @@ import 'dart:io';
 import 'package:instachatty/ui/chatTemplate/bottom-bar.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:flutter_absolute_path/flutter_absolute_path.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:instachatty/services/FirebaseHelper.dart';
+import 'package:instachatty/constants.dart';
+import 'package:instachatty/model/User.dart';
+import 'package:uuid/uuid.dart';
+import 'package:instachatty/model/momentModel.dart';
+import 'package:instachatty/services/Helper.dart';
+import 'package:instachatty/ui/chatTemplate/photofilter.dart';
+import 'package:instachatty/ui/chatTemplate/SliderCarousel.dart';
 
 class MultiPick extends StatefulWidget {
+  final User user;
+  MultiPick({this.user});
   @override
-  _MultiPickState createState() => new _MultiPickState();
+  _MultiPickState createState() => new _MultiPickState(user);
 }
 
 class _MultiPickState extends State<MultiPick> {
+  final User user;
+  final fireStoreUtils = FireStoreUtils();
+
+  _MultiPickState(this.user);
   List<Asset> images = List<Asset>();
   List<Image> imagesList = [];
   List<Image> package = [];
+  Uuid uuid = Uuid();
+  Future<List<Moment>> moments;
+  List<String> momentURL = [];
+
   String _error = 'No Error Detected';
 
   @override
@@ -28,7 +47,9 @@ class _MultiPickState extends State<MultiPick> {
         Asset asset = images[index];
         return FlatButton(
           padding: EdgeInsets.all(0.0),
-          onPressed: () {},
+          onPressed: () {
+            // Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Philter());)
+          },
           child: AssetThumb(
             asset: asset,
             width: 300,
@@ -50,7 +71,7 @@ class _MultiPickState extends State<MultiPick> {
         selectedAssets: images,
         cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
         materialOptions: MaterialOptions(
-          actionBarColor: "#abcdef",
+          actionBarColor: "#1DA1F2",
           actionBarTitle: "Select Pictures",
           allViewTitle: "All Photos",
           useDetailsView: false,
@@ -99,6 +120,8 @@ class _MultiPickState extends State<MultiPick> {
             padding: const EdgeInsets.only(bottom: 42.0),
             child: FloatingActionButton(
               onPressed: () async {
+                showProgress(context, 'Uploading Moment', false);
+                String postID = uuid.v4();
                 await Future.forEach(images, (Asset asset) async {
                   String path = await FlutterAbsolutePath.getAbsolutePath(
                       asset.identifier);
@@ -106,17 +129,32 @@ class _MultiPickState extends State<MultiPick> {
                     path,
                     fit: BoxFit.cover,
                   ));
+                  String pictureID = uuid.v4();
+                  print(pictureID);
+                  String picture = await fireStoreUtils
+                      .uploadUserImageToFireStorage(File(path), pictureID);
+                  momentURL.add(picture);
+                  print(momentURL.length);
+
                   setState(() {
                     package = imagesList;
                   });
                 });
+                await FireStoreUtils.firestore
+                    .collection(MOMENTS)
+                    .document(user.userID)
+                    .collection(MY_MOMENTS)
+                    .document(postID)
+                    .setData(
+                      Moment(urls: momentURL).toJson(),
+                    );
+                hideProgress();
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (BuildContext context) => BottomBar(
-                      images: package,
-                    ),
-                  ),
+                      builder: (BuildContext context) => SliderCarousel(
+                            user: user,
+                          )),
                 );
               },
               child: Icon(Icons.check_circle_outline),

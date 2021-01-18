@@ -53,6 +53,7 @@ dependencies:
   multi_image_picker: ^4.7.14
   photofilters: ^2.0.1
   flutter_absolute_path: ^1.0.6
+  circular_profile_avatar: ^1.0.6
 
   flutter:
     sdk: flutter

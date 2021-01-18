@@ -148,7 +148,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                   leading: displayCircleImage(
                                       contact.user.profilePictureURL,
                                       55,
-                                      false),
+                                      false,
+                                      contact.user.fullName()),
                                   title: Text(
                                     '${contact.user.fullName()}',
                                     style: TextStyle(
@@ -227,7 +228,8 @@ class _ContactsScreenState extends State<ContactsScreen> {
                                     leading: displayCircleImage(
                                         contact.user.profilePictureURL,
                                         55,
-                                        false),
+                                        false,
+                                        contact.user.fullName()),
                                     title: Text(
                                       '${contact.user.fullName()}',
                                       style: TextStyle(

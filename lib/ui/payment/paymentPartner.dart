@@ -64,7 +64,8 @@ class _PaymentPartnerCardState extends State<PaymentPartnerCard> {
                     leading: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        displayCircleImage(deal.customerURL, 40.0, false),
+                        displayCircleImage(
+                            deal.customerURL, 40.0, false, deal.customerName),
                       ],
                     ),
                     title: Column(
@@ -267,7 +268,8 @@ class _PaymentPartnerCardState extends State<PaymentPartnerCard> {
 
           // Divider(),
           Center(
-            child: displayCircleImage(deal.customerURL, 75, false),
+            child: displayCircleImage(
+                deal.customerURL, 75, false, deal.customerName),
           ),
           Column(
             children: [

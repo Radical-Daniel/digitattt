@@ -13,7 +13,7 @@ import 'package:instachatty/ui/search/ServicesSearchScreen.dart';
 import 'package:instachatty/model/Business.dart';
 import 'package:instachatty/ui/chatTemplate/multipick.dart';
 import 'package:instachatty/ui/chatTemplate/photofilter.dart';
-import 'package:instachatty/ui/chatTemplate/slider.dart';
+import 'package:instachatty/ui/chatTemplate/SliderCarousel.dart';
 import 'package:instachatty/ui/chatTemplate/bottom-bar.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -45,10 +45,9 @@ class _HomeScreenState extends State<HomeScreen> {
       ServicesSearchScreen(
         user: user,
       ),
-      BottomBar(),
-      // ProfileScreen(
-      //   user: user,
-      // ),
+      ProfileScreen(
+        user: user,
+      ),
     ];
     return Scaffold(
       bottomNavigationBar: CurvedNavigationBar(
@@ -71,7 +70,8 @@ class _HomeScreenState extends State<HomeScreen> {
             size: 30,
             color: Colors.white,
           ),
-          displayCircleImage(user.profilePictureURL, 42.0, false),
+          displayCircleImage(
+              user.profilePictureURL, 42.0, false, user.fullName()),
         ],
         color: Color(COLOR_PRIMARY),
         backgroundColor: Colors.white,

@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:instachatty/model/AddressModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
@@ -11,6 +11,7 @@ class User with ChangeNotifier {
   String phoneNumber = '';
   bool active = false;
   Timestamp lastOnlineTimestamp = Timestamp.now();
+  AddressModel address = AddressModel();
   String userID;
   String profilePictureURL = '';
   bool selected = false;
@@ -29,6 +30,7 @@ class User with ChangeNotifier {
       this.interestMap,
       this.lastOnlineTimestamp,
       this.settings,
+      this.address,
       this.fcmToken,
       this.userID,
       this.profilePictureURL,
@@ -48,6 +50,9 @@ class User with ChangeNotifier {
         active: parsedJson['active'] ?? false,
         lastOnlineTimestamp:
             parsedJson['lastOnlineTimestamp'] ?? Timestamp.now(),
+        address:
+            // AddressModel.fromJson(parsedJson['address']) ??
+            AddressModel(),
         settings: Settings.fromJson(
             parsedJson['settings'] ?? {'allowPushNotifications': true}),
         phoneNumber: parsedJson['phoneNumber'] ?? "",
@@ -92,6 +97,7 @@ class User with ChangeNotifier {
       'active': this.active,
       'lastOnlineTimestamp': this.lastOnlineTimestamp,
       'fcmToken': this.fcmToken,
+      'address': this.address.toJson(),
       'profilePictureURL': this.profilePictureURL,
       'isPartner': this.isPartner ?? false,
       'partnerEnabled': this.partnerEnabled ?? false,

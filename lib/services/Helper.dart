@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:instachatty/constants.dart';
 import 'package:intl/intl.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 
 String validateName(String value) {
   String patttern = r'(^[a-zA-Z ]*$)';
@@ -126,7 +127,7 @@ push(BuildContext context, Widget destination) {
 pushAndRemoveUntil(BuildContext context, Widget destination, bool predict) {
   Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => destination),
-          (Route<dynamic> route) => predict);
+      (Route<dynamic> route) => predict);
 }
 
 String formatTimestamp(int timestamp) {
@@ -149,7 +150,7 @@ String setLastSeen(int seconds) {
   }
 }
 
-Widget displayCircleImage(String picUrl, double size, hasBorder) =>
+Widget displayCircleImage(String picUrl, double size, hasBorder, String name) =>
     CachedNetworkImage(
         height: size,
         width: size,
@@ -157,33 +158,46 @@ Widget displayCircleImage(String picUrl, double size, hasBorder) =>
             _getCircularImageProvider(imageProvider, size, false),
         imageUrl: picUrl,
         placeholder: (context, url) =>
-            _getPlaceholderOrErrorImage(size, hasBorder),
+            _getPlaceholderOrErrorImage(size, hasBorder, name),
         errorWidget: (context, url, error) =>
-            _getPlaceholderOrErrorImage(size, hasBorder));
+            _getPlaceholderOrErrorImage(size, hasBorder, name));
 
-Widget _getPlaceholderOrErrorImage(double size, hasBorder) => Container(
-  width: size,
-  height: size,
+Widget _getPlaceholderOrErrorImage(double size, hasBorder, String name) =>
+    Container(
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         color: const Color(0xff7c94b6),
         borderRadius: new BorderRadius.all(new Radius.circular(size / 2)),
-        border: new Border.all(
-          color: Colors.white,
-          style: hasBorder ? BorderStyle.solid : BorderStyle.none,
-          width: 2.0,
-        ),
+        // border: new Border.all(
+        //   color: Colors.white,
+        //   style: hasBorder ? BorderStyle.solid : BorderStyle.none,
+        //   width: 2.0,
+        // ),
       ),
-      child: ClipOval(
-          child: Image.asset(
-        'assets/images/placeholder.jpg',
-        fit: BoxFit.cover,
-        height: size,
-        width: size,
-      )),
+      child: CircularProfileAvatar(
+        '', //sets image path, it should be a URL string. default value is empty string, if path is empty it will display only initials
+        radius: size * 2, // sets radius, default 50.0
+        backgroundColor:
+            Color(COLOR_ACCENT), // sets background color, default Colors.white
+        initialsText: Text(
+          name.split(" ").length > 1
+              ? name.split(" ").first.substring(0, 1).toUpperCase() +
+                  name.split(" ").last.substring(0, 1).toUpperCase()
+              : name[0].toUpperCase(),
+          style: TextStyle(fontSize: size / 2, color: Colors.white),
+        ), // sets initials text, set your own style, default Text('')
+        // elevation: 5.0, // sets elevation (shadow of the profile picture), default value is 0.0
+        // foregroundColor: Colors.brown.withOpacity(0.5), //sets foreground colour, it works if showInitialTextAbovePicture = true , default Colors.transparent
+        cacheImage:
+            true, // allow widget to cache image against provided url // sets on tap
+        showInitialTextAbovePicture:
+            true, // setting it true will show initials text above profile picture, default false
+      ),
     );
 
-Widget _getCircularImageProvider(ImageProvider provider, double size,
-    bool hasBorder) {
+Widget _getCircularImageProvider(
+    ImageProvider provider, double size, bool hasBorder) {
   return ClipOval(
       child: Container(
     width: size,
@@ -203,9 +217,7 @@ Widget _getCircularImageProvider(ImageProvider provider, double size,
 }
 
 bool isDarkMode(BuildContext context) {
-  if (Theme
-      .of(context)
-      .brightness == Brightness.light) {
+  if (Theme.of(context).brightness == Brightness.light) {
     return false;
   } else {
     return true;
@@ -222,15 +234,16 @@ String updateTime(Timer timer) {
     if (n >= 10) return "$n";
     return "0$n";
   }
+
   String twoDigitsHours(int n) {
     if (n >= 10) return "$n:";
     if (n == 0) return '';
     return "0$n:";
   }
+
   String twoDigitMinutes = twoDigits(callDuration.inMinutes.remainder(60));
   String twoDigitSeconds = twoDigits(callDuration.inSeconds.remainder(60));
-  return "${twoDigitsHours(
-      callDuration.inHours)}$twoDigitMinutes:$twoDigitSeconds";
+  return "${twoDigitsHours(callDuration.inHours)}$twoDigitMinutes:$twoDigitSeconds";
 }
 
 String audioMessageTime(Duration audioDuration) {

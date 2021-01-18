@@ -186,7 +186,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                                 setState(() {});
                               },
                               leading: displayCircleImage(
-                                  user.profilePictureURL, 55, false),
+                                  user.profilePictureURL,
+                                  55,
+                                  false,
+                                  user.fullName()),
                               title: Text(
                                 '${user.fullName()}',
                                 style: TextStyle(

@@ -238,7 +238,7 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                 data: SliderThemeData(
                   thumbColor: Color(COLOR_PRIMARY),
                   disabledThumbColor: Colors.grey,
-                  activeTrackColor: Color(COLOR_PRIMARY_DARK),
+                  activeTrackColor: Color(COLOR_ACCENT),
                   activeTickMarkColor: Colors.black,
                 ),
                 child: Slider(
@@ -688,7 +688,9 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                           business
                                                               .businessLogoURL,
                                                           105,
-                                                          false),
+                                                          false,
+                                                          business
+                                                              .businessName),
                                                     ),
                                                     Column(
                                                       children: [
@@ -743,7 +745,10 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                             });
                                       },
                                       leading: displayCircleImage(
-                                          business.businessLogoURL, 55, false),
+                                          business.businessLogoURL,
+                                          55,
+                                          false,
+                                          business.businessName),
                                       title: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -1100,7 +1105,9 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                                             business
                                                                 .businessLogoURL,
                                                             105,
-                                                            false),
+                                                            false,
+                                                            business
+                                                                .businessName),
                                                       ),
                                                       Column(
                                                         children: [
@@ -1160,7 +1167,8 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                                         leading: displayCircleImage(
                                             business.businessLogoURL,
                                             55,
-                                            false),
+                                            false,
+                                            business.businessName),
                                         title: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,

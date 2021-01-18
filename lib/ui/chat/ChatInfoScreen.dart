@@ -40,7 +40,8 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  displayCircleImage(member.profilePictureURL, 85, false),
+                  displayCircleImage(
+                      member.profilePictureURL, 85, false, member.fullName()),
                   Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Text(

@@ -8,7 +8,7 @@ class AddressModel {
 
   AddressModel({this.address, this.latitude, this.longitude});
 
-  factory AddressModel.fromJson(Map<dynamic, dynamic> parsedJson) {
+  factory AddressModel.fromJson(Map<String, dynamic> parsedJson) {
     return new AddressModel(
         address: parsedJson['address'] ?? '',
         latitude: parsedJson['latitude'] ?? 0.0,

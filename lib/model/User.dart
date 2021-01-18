@@ -50,9 +50,7 @@ class User with ChangeNotifier {
         active: parsedJson['active'] ?? false,
         lastOnlineTimestamp:
             parsedJson['lastOnlineTimestamp'] ?? Timestamp.now(),
-        address:
-            // AddressModel.fromJson(parsedJson['address']) ??
-            AddressModel(),
+        address: AddressModel.fromJson(parsedJson['address']) ?? AddressModel(),
         settings: Settings.fromJson(
             parsedJson['settings'] ?? {'allowPushNotifications': true}),
         phoneNumber: parsedJson['phoneNumber'] ?? "",

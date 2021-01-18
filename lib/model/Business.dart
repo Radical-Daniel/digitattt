@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:instachatty/model/User.dart';
+import 'package:instachatty/model/AddressModel.dart';
 
 class Business with ChangeNotifier {
   bool isHealthBusiness = false;

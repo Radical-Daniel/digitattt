@@ -28,6 +28,8 @@ import 'package:image_editor_pro/image_editor_pro.dart';
 import 'package:flutter_luban/flutter_luban.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:geodesy/geodesy.dart';
+import 'package:instachatty/model/AddressModel.dart';
 
 List<Business> _searchResult = [];
 Map<String, dynamic> _filterList = {
@@ -80,16 +82,22 @@ class ServicesSearchScreen extends StatefulWidget {
 
 class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
+  Geodesy geodesy = Geodesy();
   double _locationSliderValue = 15;
   final ImagePicker _imagePicker = ImagePicker();
   PickedFile image;
   bool isLoadingPic = false;
+  bool addLocationVisible = false;
   bool doneLoadingPic = false;
+  bool checked = false;
+  String newAddressValue;
   TextEditingController _messageController = TextEditingController();
+  TextEditingController _newAddressController = TextEditingController();
+  TextEditingController _newCityController = TextEditingController();
   TextEditingController _addressController = TextEditingController();
   Uuid uuid = Uuid();
   String requestID;
+  AddressModel newAddress;
   String details = '';
   final User user;
   String url = '';
@@ -120,7 +128,7 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
     _future = fireStoreUtils.getBusinesses(user.userID, true);
     super.initState();
     requestID = uuid.v4();
-
+    newAddressValue = user.address.address;
     setupStream();
   }
 
@@ -203,21 +211,128 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                           Radius.circular(360),
                         ),
                         borderSide: BorderSide(style: BorderStyle.none)),
-                    hintText: 'Search for services',
-                    suffixIcon: IconButton(
-                      iconSize: 20,
-                      icon: Icon(Icons.close),
-                      onPressed: () {
-                        FocusScope.of(context).unfocus();
-                        controller.clear();
-                        _onSearchFilterChanged('');
-                      },
+                    hintText: 'Search Health Services',
+                    suffixIcon: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          iconSize: 20,
+                          icon: IconButton(
+                            icon: Icon(
+                              Icons.location_on,
+                              color: addLocationVisible
+                                  ? Color(COLOR_ACCENT)
+                                  : Color(COLOR_PRIMARY),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                addLocationVisible = !addLocationVisible;
+                              });
+                            },
+                          ),
+                          onPressed: () {
+                            FocusScope.of(context).unfocus();
+                            controller.clear();
+                            _onSearchFilterChanged('');
+                          },
+                        ),
+                        IconButton(
+                          iconSize: 20,
+                          icon: Icon(Icons.close),
+                          onPressed: () {
+                            FocusScope.of(context).unfocus();
+                            controller.clear();
+                            _onSearchFilterChanged('');
+                          },
+                        ),
+                      ],
                     ),
                     // prefix: Icon(Icons.location_on_outlined),
                     prefixIcon: Icon(
                       Icons.search,
                       size: 20,
                     )),
+              ),
+            ),
+            Visibility(
+              visible: addLocationVisible,
+              child: Column(
+                children: [
+                  Text(
+                    "Measure From Location",
+                    style: TextStyle(
+                      color: Color(COLOR_PRIMARY),
+                      fontSize: 16.0,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 7.0),
+                    child: TextField(
+                      controller: _newAddressController,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 10.0),
+                        isDense: true,
+                        fillColor: isDarkMode(context)
+                            ? Colors.grey[700]
+                            : Colors.grey[200],
+                        filled: true,
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(360),
+                            ),
+                            borderSide: BorderSide(style: BorderStyle.none)),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(360),
+                            ),
+                            borderSide: BorderSide(style: BorderStyle.none)),
+                        hintText: newAddressValue,
+                        prefixIcon: Icon(
+                          Icons.location_on,
+                          color: Color(COLOR_PRIMARY),
+                        ),
+                        suffixIcon: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.refresh,
+                                color: Color(COLOR_PRIMARY),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  newAddress = user.address;
+                                  newAddressValue = user.address.address;
+                                });
+                                _onSearchFilterChanged(controller.text);
+                              },
+                            ),
+                            IconButton(
+                                icon: Icon(Icons.check),
+                                color: Color(COLOR_PRIMARY),
+                                onPressed: () async {
+                                  if (_newAddressController.text.length > 0) {
+                                    newAddress = await AddressModel(
+                                            address: _newAddressController.text)
+                                        .geoAddress();
+                                    setState(() {
+                                      newAddressValue =
+                                          _newAddressController.text;
+                                      _newAddressController.clear();
+                                      _onSearchFilterChanged(controller.text);
+                                      addLocationVisible = false;
+                                    });
+                                  }
+                                }),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             Center(
@@ -251,92 +366,94 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
                     setState(() {
                       _locationSliderValue = value;
                     });
+                    _onSearchFilterChanged(controller.text);
                   },
                 ),
               ),
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              // child: Row(
-              //   children: [
-              //     Padding(
-              //         padding: const EdgeInsets.all(4.0),
-              //         child: FilterChip(
-              //           selected: _filterList['doctor'],
-              //           selectedColor: Color(COLOR_PRIMARY),
-              //           onSelected: (bool value) {
-              //             setState(() {
-              //               _filterList['doctor'] = value;
-              //             });
-              //             _onSearchFilterChanged(controller.text);
-              //           },
-              //           label: Text(
-              //             "DOCTOR",
-              //             style: TextStyle(
-              //                 color: _filterList['doctor']
-              //                     ? Colors.white
-              //                     : Colors.black),
-              //           ),
-              //         )),
-              //     Padding(
-              //         padding: const EdgeInsets.all(4.0),
-              //         child: FilterChip(
-              //           selected: _filterList['pharmacist'],
-              //           selectedColor: Color(COLOR_PRIMARY),
-              //           onSelected: (value) {
-              //             setState(() {
-              //               _filterList['pharmacist'] = value;
-              //               _onSearchFilterChanged(controller.text);
-              //             });
-              //           },
-              //           label: Text(
-              //             "PHARMACIST",
-              //             style: TextStyle(
-              //                 color: _filterList['pharmacist']
-              //                     ? Colors.white
-              //                     : Colors.black),
-              //           ),
-              //         )),
-              //     Padding(
-              //         padding: const EdgeInsets.all(4.0),
-              //         child: FilterChip(
-              //           selected: _filterList['laboratory'],
-              //           selectedColor: Color(COLOR_PRIMARY),
-              //           onSelected: (bool value) {
-              //             setState(() {
-              //               _filterList['laboratory'] = value;
-              //               _onSearchFilterChanged(controller.text);
-              //             });
-              //           },
-              //           label: Text(
-              //             "LABORATORY",
-              //             style: TextStyle(
-              //                 color: _filterList['laboratory']
-              //                     ? Colors.white
-              //                     : Colors.black),
-              //           ),
-              //         )),
-              //     Padding(
-              //         padding: const EdgeInsets.all(4.0),
-              //         child: FilterChip(
-              //           selected: _filterList['radiologist'],
-              //           selectedColor: Color(COLOR_PRIMARY),
-              //           onSelected: (bool value) {
-              //             setState(() {
-              //               _filterList['radiologist'] = value;
-              //             });
-              //             _onSearchFilterChanged(controller.text);
-              //           },
-              //           label: Text(
-              //             "RADIOLOGIST",
-              //             style: TextStyle(
-              //                 color: _filterList['radiologist']
-              //                     ? Colors.white
-              //                     : Colors.black),
-              //           ),
-              //         )),
-              //   ],
-              // ),
+              child: Row(
+                children: [
+                  Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: FilterChip(
+                        checkmarkColor: Colors.white,
+                        selected: _filterList['doctor'],
+                        selectedColor: Color(COLOR_PRIMARY),
+                        onSelected: (bool value) {
+                          setState(() {
+                            _filterList['doctor'] = value;
+                          });
+                          _onSearchFilterChanged(controller.text);
+                        },
+                        label: Text(
+                          "DOCTOR",
+                          style: TextStyle(
+                              color: _filterList['doctor']
+                                  ? Colors.white
+                                  : Colors.black),
+                        ),
+                      )),
+                  Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: FilterChip(
+                        selected: _filterList['pharmacist'],
+                        selectedColor: Color(COLOR_PRIMARY),
+                        onSelected: (value) {
+                          setState(() {
+                            _filterList['pharmacist'] = value;
+                            _onSearchFilterChanged(controller.text);
+                          });
+                        },
+                        label: Text(
+                          "PHARMACIST",
+                          style: TextStyle(
+                              color: _filterList['pharmacist']
+                                  ? Colors.white
+                                  : Colors.black),
+                        ),
+                      )),
+                  Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: FilterChip(
+                        selected: _filterList['laboratory'],
+                        selectedColor: Color(COLOR_PRIMARY),
+                        onSelected: (bool value) {
+                          setState(() {
+                            _filterList['laboratory'] = value;
+                            _onSearchFilterChanged(controller.text);
+                          });
+                        },
+                        label: Text(
+                          "LABORATORY",
+                          style: TextStyle(
+                              color: _filterList['laboratory']
+                                  ? Colors.white
+                                  : Colors.black),
+                        ),
+                      )),
+                  Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: FilterChip(
+                        selected: _filterList['radiologist'],
+                        selectedColor: Color(COLOR_PRIMARY),
+                        onSelected: (bool value) {
+                          setState(() {
+                            _filterList['radiologist'] = value;
+                          });
+                          _onSearchFilterChanged(controller.text);
+                        },
+                        label: Text(
+                          "RADIOLOGIST",
+                          style: TextStyle(
+                              color: _filterList['radiologist']
+                                  ? Colors.white
+                                  : Colors.black),
+                        ),
+                      )),
+                ],
+              ),
             ),
             FutureBuilder<List<Business>>(
               future: _future,
@@ -1228,15 +1345,21 @@ class _ServicesSearchScreenState extends State<ServicesSearchScreen> {
 
   _onSearchFilterChanged(String searchedText) async {
     _searchResult.clear();
-    List<String> selectedFilters =
-        _filterList.keys.where(((item) => _filterList[item] == true)).toList();
-    print(selectedFilters);
+    // List<String> selectedFilters =
+    //     _filterList.keys.where(((item) => _filterList[item] == true)).toList();
     searchedText = searchedText.isEmpty ? ' ' : searchedText;
     _searchResult = _businesses
-        .where((partner) => partner.businessName
-            .toLowerCase()
-            .contains(searchedText.toLowerCase()))
+        .where((partner) =>
+            partner.businessName
+                .toLowerCase()
+                .contains(searchedText.toLowerCase()) &&
+            geodesy.distanceBetweenTwoGeoPoints(
+                    LatLng(partner.businessAddress.last['latitude'],
+                        partner.businessAddress.last['longitude']),
+                    LatLng(newAddress.latitude, newAddress.longitude)) <=
+                _locationSliderValue * 1000)
         .toList();
+
     setState(() {});
   }
 
